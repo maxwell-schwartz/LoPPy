@@ -1,0 +1,85 @@
+# First attempt at LOgically Parsing with PYthon
+
+class FactTracker(object):
+    def __init__(self):
+        self.known_facts = {}
+
+    def update_knowledge(self, fact):
+        '''Add a fact to the known facts'''
+        if fact.name in self.known_facts:
+            self.known_facts[fact.name].add(fact.elements)
+        else:
+            self.known_facts[fact.name] = set([fact.elements])
+
+    def is_fact(self, fact):
+        '''Return a boolean indicating whether fact is true'''
+        if fact.name not in self.known_facts:
+            return False
+        if fact.elements in self.known_facts[fact.name]:
+            return True
+        else:
+            return False
+
+    def solve_one(self, fact):
+        '''Provide all possible values for variables in a single fact'''
+        # List indices of elements that are variables and those that aren't
+        knowns = [i for i, e in enumerate(fact.elements) if e[0] != '?' 
+                    and e != '_']
+        unknowns = [i for i, e in enumerate(fact.elements) if e[0] == '?']
+
+        # Loop through all facts of this name
+        # If all known elements match, that fact is a viable option
+        for choice in self.known_facts[fact.name]:
+            # Default viability to True
+            viable = True
+            for k in knowns:
+                if choice[k] != fact.elements[k]:
+                    # If known index doesn't match the choice's index,
+                    # this fact isn't one of our options
+                    viable = False
+            # If choice is viable at the end, provide all solutions to unknowns
+            if viable:
+                solution = [(fact.elements[u], choice[u]) for u in unknowns]
+                yield tuple(solution)
+
+    def solve_full(self, *args):
+        '''Yield only solutions that satisfy all searched facts'''
+        solutions = []
+        for a in args:
+            one_solved = set([])
+            for s in self.solve_one(a):
+                one_solved.add(s)
+            solutions.append(one_solved)
+
+        solved = set.intersection(*solutions)
+        for s in solved:
+            yield s
+
+
+class Fact(object):
+    def __init__(self, name, *args):
+        self.name = name
+        self.elements = args
+
+    def get_args(self):
+        print(self.name)
+        print(self.elements)
+
+def main():
+    # For testing purposes
+
+    tracker = FactTracker()
+    tracker.update_knowledge(Fact('child', 'Max', 'Jan', 'Ellen'))
+    tracker.update_knowledge(Fact('child', 'Dash', 'Jan', 'Ellen'))
+    tracker.update_knowledge(Fact('child', 'Rocky', 'Jan', 'Ellen'))
+    tracker.update_knowledge(Fact('spouse', 'Jan', 'Ellen'))
+    tracker.update_knowledge(Fact('brother', 'Max', 'Dash'))
+    tracker.update_knowledge(Fact('brother', 'Max', 'Rocky'))
+    tracker.update_knowledge(Fact('brother', 'Dash', 'Rocky'))
+    
+    for i in (tracker.solve_full(Fact('child', '?X', 'Jan', 'Ellen'), 
+                Fact('brother', '?X', 'Rocky'))):
+        print(i)
+
+if __name__ == "__main__":
+    main()
