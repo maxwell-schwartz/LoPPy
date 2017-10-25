@@ -67,7 +67,7 @@ class Fact(object):
 
 def main():
     # For testing purposes
-
+    # Yes, these are my real family members
     tracker = FactTracker()
     tracker.update_knowledge(Fact('child', 'Max', 'Jan', 'Ellen'))
     tracker.update_knowledge(Fact('child', 'Dash', 'Jan', 'Ellen'))
