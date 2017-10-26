@@ -10,14 +10,16 @@ def main():
     knowledge.update_knowledge(loppy.Fact('ready for bed', 'Max'))
     knowledge.update_knowledge(loppy.Fact('ready for bed', 'Most People'))
 
-    tired_and_ready = knowledge.solve_full(loppy.Fact('is tired', '?who'), 
-                        loppy.Fact('ready for bed', '?who'))
-    for t in tired_and_ready:
-        print('{} = tired and ready for bed.'.format(t[0][1]))
+    print(knowledge.get_types('Max'))
 
-    ready = knowledge.solve_one(loppy.Fact('ready for bed', '?X'))
-    for r in ready:
-        print('{} = ready for bed.'.format(r[0][1]))
+    # tired_and_ready = knowledge.solve_full(loppy.Fact('is tired', '?who'), 
+    #                     loppy.Fact('ready for bed', '?who'))
+    # for t in tired_and_ready:
+    #     print('{} = tired and ready for bed.'.format(t[0][1]))
+
+    # ready = knowledge.solve_one(loppy.Fact('ready for bed', '?X'))
+    # for r in ready:
+    #     print('{} = ready for bed.'.format(r[0][1]))
 
 
 main()
