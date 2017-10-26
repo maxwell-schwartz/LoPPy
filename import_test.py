@@ -10,7 +10,9 @@ def main():
     knowledge.update_knowledge(lp.Fact('ready for bed', 'Max'))
     knowledge.update_knowledge(lp.Fact('ready for bed', 'Most People'))
 
-    print(knowledge.get_types('Max'))
+    print(knowledge.get_types(['Max']))
+    print(knowledge.is_a(['Most People'], 'ready for bed'))
+    # print(knowledge.is_a('Most Poeple', 'is tired'))
 
     # tired_and_ready = knowledge.solve_full(lp.Fact('is tired', '?who'), 
     #                     lp.Fact('ready for bed', '?who'))

@@ -29,11 +29,21 @@ class FactTracker(object):
         else:
             return False
 
-    def get_types(self, *elements):
+    def get_types(self, elements):
         '''Return known fact-types of given list of elements'''
         tup_elements = tuple(elements)
         if tup_elements in self.known_elements:
             return self.known_elements[tup_elements]
+        else:
+            return []
+
+    def is_a(self, elements, type_query):
+        '''Return a boolean indicating if given elements match a given type'''
+        known_types = self.get_types(elements)
+        if type_query in known_types:
+            return True
+        else:
+            return False
 
     def solve_one(self, fact):
         '''Provide all possible values for variables in a single fact'''
