@@ -109,7 +109,7 @@ def is_sentence(knowledge, elements):
                 if tr_truth:
                     return True, subj_pos + tr_pos
                 elif int_truth:
-                    return True, subj_pos + int_truth
+                    return True, subj_pos + int_pos
             new_head, *tail = tail
             head += [new_head] 
     return False, []
