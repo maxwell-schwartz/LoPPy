@@ -76,6 +76,7 @@ def is_int_vp(knowledge, elements):
 
 def is_tr_vp(knowledge, elements):
     '''Determine if given set of words is a Transitive Verb Phrase'''
+
     if len(elements) < 2:
         return False, []
     head, *tail = elements
@@ -93,25 +94,52 @@ def is_tr_vp(knowledge, elements):
         return truth, ['ADV'] + pos_list
     return False, []
 
+def is_vp(knowledge, elements):
+    '''Determine if given set of words is any type of Verb Phrase'''
+    tr_truth, tr_pos = is_tr_vp(knowledge, elements)
+    int_truth, int_pos = is_int_vp(knowledge, elements)
+    if tr_truth:
+        return tr_truth, tr_pos
+    elif int_truth:
+        return int_truth, int_pos
+    return False, []
+
+def is_sub_clause(knowledge, elements):
+    '''Determine if given set of words is a Subclause'''
+
+    if len(elements) < 2:
+        return False, []
+    head, *tail = elements
+    head = [head]
+    if knowledge.is_a(head, 'C-MARKER'):
+        truth, pos_list = is_vp(knowledge, tail)
+        if truth:
+            return truth, ['C-MARKER'] + pos_list
+        head, *tail = tail
+        head = [head]
+        while tail:
+            vp_truth, vp_pos = is_vp(knowledge, head)
+            sub_truth, sub_pos = is_sub_clause(knowledge, tail)
+            if vp_truth and sub_truth:
+                return True, ['C-MARKER'] + vp_pos + sub_pos
+            new_head, *tail = tail
+            head += [new_head]
+    return False, []
+
 def is_sentence(knowledge, elements):
     '''Determin if given set of words is a grammatical sentence'''
 
     if len(elements) < 2:
         return False, []
-    else:
-        head, *tail = elements
-        head = [head]
-        while tail:
-            subj_truth, subj_pos = is_dp(knowledge, head)
-            tr_truth, tr_pos = is_tr_vp(knowledge, tail)
-            int_truth, int_pos = is_int_vp(knowledge, tail)
-            if subj_truth:
-                if tr_truth:
-                    return True, subj_pos + tr_pos
-                elif int_truth:
-                    return True, subj_pos + int_pos
-            new_head, *tail = tail
-            head += [new_head] 
+    head, *tail = elements
+    head = [head]
+    while tail:
+        subj_truth, subj_pos = is_dp(knowledge, head)
+        pred_truth, pred_pos = is_vp(knowledge, tail)
+        if subj_truth and pred_truth:
+            return True, subj_pos + pred_pos
+        new_head, *tail = tail
+        head += [new_head] 
     return False, []
 
 def main():
@@ -129,6 +157,8 @@ def main():
         adverbs = infile.readlines()
     with open('word_lists/determiners.txt', 'r') as infile:
         determiners = infile.readlines()
+    with open('word_lists/clause_markers.txt', 'r') as infile:
+        c_markers = infile.readlines()
 
     for n in nouns:
         knowledge.update_knowledge(lp.Fact('NOUN', n.strip()))
@@ -142,6 +172,8 @@ def main():
         knowledge.update_knowledge(lp.Fact('ADV', ad.strip()))
     for d in determiners:
         knowledge.update_knowledge(lp.Fact('DET', d.strip()))
+    for c in c_markers:
+        knowledge.update_knowledge(lp.Fact('C-MARKER', c.strip()))
 
     keep_going = 'y'
     while keep_going == 'y':
@@ -152,7 +184,8 @@ def main():
         # print('ADVP > ', is_advp(knowledge, user_sent))
         # print('DP + ADVP > ', is_dp_with_advp(knowledge, user_sent))
         # print('DP > ', is_dp(knowledge, user_sent))
-        print('SENTENCE > ', is_sentence(knowledge, user_sent))
+        print('Subclause > ', is_sub_clause(knowledge, user_sent))
+        # print('SENTENCE > ', is_sentence(knowledge, user_sent))
         keep_going = input('Continue? (y/n) ')
 
 if __name__ == '__main__':
