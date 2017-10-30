@@ -1,0 +1,4 @@
+eats
+drinks
+finds
+throws
