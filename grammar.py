@@ -46,26 +46,6 @@ def is_advp(knowledge, elements):
         return truth, ['ADV'] + pos_list
     return False, []
 
-def is_dp_with_advp(knowledge, elements):
-    '''
-    Determine if given set of words is a Noun Phrase followed by a series of Adverbs
-    This is a potential component of Transitive Verb Phrases
-    e.g. "the food quickly"
-    (at the end of a VP, this would be something like "eats the food quickly")
-    '''
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    head = [head]
-    while tail:
-        dp_truth, dp_pos = is_dp(knowledge, head)
-        advp_truth, advp_pos = is_advp(knowledge, tail)
-        if dp_truth and advp_truth:
-            return True, dp_pos + advp_pos
-        new_head, *tail = tail
-        head += [new_head]
-    return False, []
-
 def is_int_vp(knowledge, elements):
     '''
     Determine if a given set of words is an Intransitive Verb Phrase
@@ -78,11 +58,7 @@ def is_int_vp(knowledge, elements):
         # A lone verb works
         return True, ['INT_VERB']
     head, *tail = elements
-    if knowledge.is_a([head], 'INT_VERB'):
-        # A verb followed by any number of adverbs works
-        truth, pos_list = is_advp(knowledge, tail)
-        return truth, ['INT_VERB'] + pos_list
-    elif knowledge.is_a([head], 'ADV'):
+    if knowledge.is_a([head], 'ADV'):
         # Any number of adverbs can precede the verb
         truth, pos_list = is_int_vp(knowledge, tail)
         return truth, ['ADV'] + pos_list
@@ -98,32 +74,53 @@ def is_tr_vp(knowledge, elements):
         return False, []
     head, *tail = elements
     if knowledge.is_a([head], 'TR_VERB'):
-        # Check if words following the transitive verb are an NP or an NP+ADVP
+        # Check if words following the transitive verb are a DP
         dp_truth, dp_pos_list = is_dp(knowledge, tail)
-        dp_advp_truth, dp_advp_pos_list = is_dp_with_advp(knowledge, tail)
         if dp_truth:
             return True, ['TR_VERB'] + dp_pos_list
-        elif dp_advp_truth:
-            return True, ['TR_VERB'] + dp_advp_pos_list
     elif knowledge.is_a([head], 'ADV'):
         # Any number of adverbs can precede the verb
         truth, pos_list = is_tr_vp(knowledge, tail)
         return truth, ['ADV'] + pos_list
     return False, []
 
-def is_vp(knowledge, elements):
+def is_simple_vp(knowledge, elements):
     '''Determine if given set of words is any type of Verb Phrase'''
+
     tr_truth, tr_pos = is_tr_vp(knowledge, elements)
     int_truth, int_pos = is_int_vp(knowledge, elements)
     if tr_truth:
-        return tr_truth, tr_pos
+        return True, tr_pos
     elif int_truth:
-        return int_truth, int_pos
+        return True, int_pos
     return False, []
 
-def is_sub_clause(knowledge, elements):
+def is_simple_vp_with_advp(knowledge, elements):
     '''
-    Determine if given set of words is a Subclause
+    Determine if given set of words is a VP followed by any number of adverbs
+    This includes 0 adverbs
+    e.g. "eats the food often quickly"
+    '''
+
+    vp_truth, vp_pos = is_simple_vp(knowledge, elements)
+    # If it is a standard VP, it is accepted
+    if vp_truth:
+        return True, vp_pos
+    head, *tail = elements
+    head = [head]
+    # Check to see if it is a VP + ADVP
+    while tail:
+        vp_truth, vp_pos = is_simple_vp(knowledge, head)
+        adv_truth, adv_pos = is_advp(knowledge, tail)
+        if vp_truth and adv_truth:
+            return True, vp_pos + adv_pos
+        new_head, *tail = tail
+        head += [new_head]
+    return False, []
+
+def is_specifier(knowledge, elements):
+    '''
+    Determine if given set of words is a Specifier
     e.g. "that eats the bird that eats the food"
     '''
 
@@ -131,19 +128,95 @@ def is_sub_clause(knowledge, elements):
         return False, []
     head, *tail = elements
     head = [head]
-    if knowledge.is_a(head, 'C-MARKER'):
-        truth, pos_list = is_vp(knowledge, tail)
+    if knowledge.is_a(head, 'SPEC'):
+        truth, pos_list = is_simple_vp(knowledge, tail)
         if truth:
-            return truth, ['C-MARKER'] + pos_list
+            return truth, ['SPEC'] + pos_list
         head, *tail = tail
         head = [head]
         while tail:
-            vp_truth, vp_pos = is_vp(knowledge, head)
-            sub_truth, sub_pos = is_sub_clause(knowledge, tail)
+            vp_truth, vp_pos = is_simple_vp(knowledge, head)
+            sub_truth, sub_pos = is_specifier(knowledge, tail)
             if vp_truth and sub_truth:
-                return True, ['C-MARKER'] + vp_pos + sub_pos
+                return True, ['SPEC'] + vp_pos + sub_pos
             new_head, *tail = tail
             head += [new_head]
+    return False, []
+
+def is_specifier_with_advp(knowledge, elements):
+    '''
+    Determine if given set of words is a Specifier followed by any number of adverbs
+    This includes 0 adverbs
+    e.g. "that eats the bird that eats the food quickly"
+    '''
+
+    sc_truth, sc_pos = is_specifier(knowledge, elements)
+    # If it is a standard Specifier, it is accepted
+    if sc_truth:
+        return True, sc_pos
+    head, *tail = elements
+    head = [head]
+    # Check to see if it is a Specifier + ADVP
+    while tail:
+        sc_truth, sc_pos = is_specifier(knowledge, head)
+        adv_truth, adv_pos = is_advp(knowledge, tail)
+        if sc_truth and adv_truth:
+            return True, sc_pos + adv_pos
+        new_head, *tail = tail
+        head += [new_head]
+    return False, []
+
+def is_tr_vp_with_specifier(knowledge, elements):
+    '''
+    Determine if given set of words is a transitive VP with an optional Specifier
+    e.g. "eats the bird that eats the food"
+    '''
+
+    head, *tail = elements
+    head = [head]
+    # Check to see if it is a Transitive VP + Specifier with optional ADVP
+    while tail:
+        tr_truth, tr_pos = is_tr_vp(knowledge, head)
+        sp_truth, sp_pos = is_specifier_with_advp(knowledge, tail)
+        if tr_truth and sp_truth:
+            return True, tr_pos + sp_pos
+        new_head, *tail = tail
+        head += [new_head]
+    return False, []
+
+def is_subject(knowledge, elements):
+    '''
+    Determine if given set of words is a viable Subject for a sentence
+    DP | DP + Specifier | DP + Specifier + ADVP
+    '''
+
+    dp_truth, dp_pos = is_dp(knowledge, elements)
+    # If it is a standard DP, it is accepted
+    if dp_truth:
+        return True, dp_pos
+    head, *tail = elements
+    head = [head]
+    # Check to see if it is a DP + Specifier with ADVP
+    while tail:
+        dp_truth, dp_pos = is_dp(knowledge, head)
+        sc_truth, sc_pos = is_specifier_with_advp(knowledge, tail)
+        if dp_truth and sc_truth:
+            return True, dp_pos + sc_pos
+        new_head, *tail = tail
+        head += [new_head]
+    return False, []
+
+def is_predicate(knowledge, elements):
+    '''
+    Determine if given set of words is a viable Predicate for a sentence
+    VP | VP + ADVP | Int_VP + Specifier | Int_VP + Specifier + ADVP
+    '''
+    vp_truth, vp_pos = is_simple_vp_with_advp(knowledge, elements)
+    tr_sp_truth, tr_sp_pos = is_tr_vp_with_specifier(knowledge, elements)
+    if vp_truth:
+        return True, vp_pos
+    elif tr_sp_truth:
+        return True, tr_sp_pos
     return False, []
 
 def is_sentence(knowledge, elements):
@@ -154,8 +227,8 @@ def is_sentence(knowledge, elements):
     head, *tail = elements
     head = [head]
     while tail:
-        subj_truth, subj_pos = is_dp(knowledge, head)
-        pred_truth, pred_pos = is_vp(knowledge, tail)
+        subj_truth, subj_pos = is_subject(knowledge, head)
+        pred_truth, pred_pos = is_predicate(knowledge, tail)
         if subj_truth and pred_truth:
             return True, subj_pos + pred_pos
         new_head, *tail = tail
@@ -177,8 +250,8 @@ def main():
         adverbs = infile.readlines()
     with open('word_lists/determiners.txt', 'r') as infile:
         determiners = infile.readlines()
-    with open('word_lists/clause_markers.txt', 'r') as infile:
-        c_markers = infile.readlines()
+    with open('word_lists/specifiers.txt', 'r') as infile:
+        specifiers = infile.readlines()
 
     for n in nouns:
         knowledge.update_knowledge(lp.Fact('NOUN', n.strip()))
@@ -192,8 +265,8 @@ def main():
         knowledge.update_knowledge(lp.Fact('ADV', ad.strip()))
     for d in determiners:
         knowledge.update_knowledge(lp.Fact('DET', d.strip()))
-    for c in c_markers:
-        knowledge.update_knowledge(lp.Fact('C-MARKER', c.strip()))
+    for c in specifiers:
+        knowledge.update_knowledge(lp.Fact('SPEC', c.strip()))
 
     keep_going = 'y'
     while keep_going == 'y':
@@ -202,10 +275,14 @@ def main():
         # print('INT_VP > ', is_int_vp(knowledge, user_sent))
         # print('TR_VP > ', is_tr_vp(knowledge, user_sent))
         # print('ADVP > ', is_advp(knowledge, user_sent))
-        # print('DP + ADVP > ', is_dp_with_advp(knowledge, user_sent))
+        # print('VP + ADVP > ', is_simple_vp_with_advp(knowledge, user_sent))
         # print('DP > ', is_dp(knowledge, user_sent))
-        print('Subclause > ', is_sub_clause(knowledge, user_sent))
-        # print('SENTENCE > ', is_sentence(knowledge, user_sent))
+        # print('Specifier > ', is_specifier(knowledge, user_sent))
+        # print('Specifier + ADVP > ', is_specifier_with_advp(knowledge, user_sent))
+        # print('TR_VP + Specifier > ', is_tr_vp_with_specifier(knowledge, user_sent))
+        # print('Subject > ', is_subject(knowledge, user_sent))
+        # print('Predicate > ', is_predicate(knowledge, user_sent))
+        print('SENTENCE > ', is_sentence(knowledge, user_sent))
         keep_going = input('Continue? (y/n) ')
 
 if __name__ == '__main__':
