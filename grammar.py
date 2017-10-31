@@ -1,7 +1,10 @@
 import loppy as lp
 
 def is_np(knowledge, elements):
-    '''Determine if a given set of words is a Noun Phrase'''
+    '''
+    Determine if a given set of words is a Noun Phrase
+    e.g. "small blue dog"
+    '''
 
     if len(elements) == 0:
         return False, []
@@ -14,7 +17,10 @@ def is_np(knowledge, elements):
     return False, []
 
 def is_dp(knowledge, elements):
-    '''Determine if a given set of words in a Determiner Phrase'''
+    '''
+    Determine if a given set of words in a Determiner Phrase
+    e.g. "the small blue dog"
+    '''
 
     if len(elements) < 2:
         return False, []
@@ -25,7 +31,10 @@ def is_dp(knowledge, elements):
     return False, []
 
 def is_advp(knowledge, elements):
-    '''Determing if given set of words is a series of Adverbs'''
+    '''
+    Determing if given set of words is a series of Adverbs
+    e.g. "often quickly"
+    '''
 
     if len(elements) == 0:
         return False, []
@@ -41,6 +50,8 @@ def is_dp_with_advp(knowledge, elements):
     '''
     Determine if given set of words is a Noun Phrase followed by a series of Adverbs
     This is a potential component of Transitive Verb Phrases
+    e.g. "the food quickly"
+    (at the end of a VP, this would be something like "eats the food quickly")
     '''
     if len(elements) < 2:
         return False, []
@@ -56,7 +67,10 @@ def is_dp_with_advp(knowledge, elements):
     return False, []
 
 def is_int_vp(knowledge, elements):
-    '''Determine if a given set of words is an Intransitive Verb Phrase'''
+    '''
+    Determine if a given set of words is an Intransitive Verb Phrase
+    e.g. "often sleeps"
+    '''
 
     if len(elements) == 0:
         return False, []
@@ -75,7 +89,10 @@ def is_int_vp(knowledge, elements):
     return False, []
 
 def is_tr_vp(knowledge, elements):
-    '''Determine if given set of words is a Transitive Verb Phrase'''
+    '''
+    Determine if given set of words is a Transitive Verb Phrase
+    e.g. "throws the food"
+    '''
 
     if len(elements) < 2:
         return False, []
@@ -105,7 +122,10 @@ def is_vp(knowledge, elements):
     return False, []
 
 def is_sub_clause(knowledge, elements):
-    '''Determine if given set of words is a Subclause'''
+    '''
+    Determine if given set of words is a Subclause
+    e.g. "that eats the bird that eats the food"
+    '''
 
     if len(elements) < 2:
         return False, []
@@ -127,7 +147,7 @@ def is_sub_clause(knowledge, elements):
     return False, []
 
 def is_sentence(knowledge, elements):
-    '''Determin if given set of words is a grammatical sentence'''
+    '''Determine if given set of words is a grammatical sentence'''
 
     if len(elements) < 2:
         return False, []
