@@ -1,0 +1,4 @@
+eats
+dances
+smokes
+sleeps

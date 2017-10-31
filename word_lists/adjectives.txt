@@ -1,0 +1,8 @@
+small
+big
+blue
+red
+quiet
+loud
+fast
+slow

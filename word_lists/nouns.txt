@@ -1,0 +1,7 @@
+dog
+cat
+rabbit
+bird
+lizard
+water
+food
