@@ -1,5 +1,20 @@
 import loppy as lp
 
+def is_branches(knowledge, elements, f1, f2):
+    '''Determine if given set of words is combo of two types'''
+
+    head, *tail = elements
+    head = [head]
+    # Check to see if it is a VP + ADVP
+    while tail:
+        left_truth, left_pos = f1(knowledge, head)
+        right_truth, right_pos = f2(knowledge, tail)
+        if left_truth and right_truth:
+            return True, left_pos + right_pos
+        new_head, *tail = tail
+        head += [new_head]
+    return False, []
+
 def is_np_s(knowledge, elements):
     '''
     Determine if a given set of words is a Singular Noun Phrase
@@ -54,9 +69,9 @@ def is_int_vp_3(knowledge, elements):
 
     if len(elements) == 0:
         return False, []
-    elif len(elements) == 1 and knowledge.is_a(elements, 'INT_VERB'):
+    elif len(elements) == 1 and knowledge.is_a(elements, 'INT_VERB_3'):
         # A lone verb works
-        return True, ['INT_VERB']
+        return True, ['INT_VERB_3']
     head, *tail = elements
     if knowledge.is_a([head], 'ADV'):
         # Any number of adverbs can precede the verb
@@ -73,11 +88,11 @@ def is_tr_vp_3(knowledge, elements):
     if len(elements) < 2:
         return False, []
     head, *tail = elements
-    if knowledge.is_a([head], 'TR_VERB'):
+    if knowledge.is_a([head], 'TR_VERB_3'):
         # Check if words following the transitive verb are a DP
         dp_truth, dp_pos_list = is_dp_s(knowledge, tail)
         if dp_truth:
-            return True, ['TR_VERB'] + dp_pos_list
+            return True, ['TR_VERB_3'] + dp_pos_list
     elif knowledge.is_a([head], 'ADV'):
         # Any number of adverbs can precede the verb
         truth, pos_list = is_tr_vp_3(knowledge, tail)
@@ -106,17 +121,8 @@ def is_simple_vp_3_with_advp(knowledge, elements):
     # If it is a standard VP, it is accepted
     if vp_truth:
         return True, vp_pos
-    head, *tail = elements
-    head = [head]
     # Check to see if it is a VP + ADVP
-    while tail:
-        vp_truth, vp_pos = is_simple_vp_3(knowledge, head)
-        adv_truth, adv_pos = is_advp(knowledge, tail)
-        if vp_truth and adv_truth:
-            return True, vp_pos + adv_pos
-        new_head, *tail = tail
-        head += [new_head]
-    return False, []
+    return is_branches(knowledge, elements, is_simple_vp_3, is_advp)
 
 def is_specifier(knowledge, elements):
     '''
@@ -154,17 +160,8 @@ def is_specifier_with_advp(knowledge, elements):
     # If it is a standard Specifier, it is accepted
     if sc_truth:
         return True, sc_pos
-    head, *tail = elements
-    head = [head]
     # Check to see if it is a Specifier + ADVP
-    while tail:
-        sc_truth, sc_pos = is_specifier(knowledge, head)
-        adv_truth, adv_pos = is_advp(knowledge, tail)
-        if sc_truth and adv_truth:
-            return True, sc_pos + adv_pos
-        new_head, *tail = tail
-        head += [new_head]
-    return False, []
+    return is_branches(knowledge, elements, is_specifier, is_advp)
 
 def is_tr_vp_3_with_specifier(knowledge, elements):
     '''
@@ -172,17 +169,7 @@ def is_tr_vp_3_with_specifier(knowledge, elements):
     e.g. "eats the bird that eats the food"
     '''
 
-    head, *tail = elements
-    head = [head]
-    # Check to see if it is a Transitive VP + Specifier with optional ADVP
-    while tail:
-        tr_truth, tr_pos = is_tr_vp_3(knowledge, head)
-        sp_truth, sp_pos = is_specifier_with_advp(knowledge, tail)
-        if tr_truth and sp_truth:
-            return True, tr_pos + sp_pos
-        new_head, *tail = tail
-        head += [new_head]
-    return False, []
+    return is_branches(knowledge, elements, is_tr_vp_3, is_specifier_with_advp)
 
 def is_subject(knowledge, elements):
     '''
@@ -194,17 +181,8 @@ def is_subject(knowledge, elements):
     # If it is a standard DP, it is accepted
     if dp_truth:
         return True, dp_pos
-    head, *tail = elements
-    head = [head]
     # Check to see if it is a DP + Specifier with ADVP
-    while tail:
-        dp_truth, dp_pos = is_dp_s(knowledge, head)
-        sc_truth, sc_pos = is_specifier_with_advp(knowledge, tail)
-        if dp_truth and sc_truth:
-            return True, dp_pos + sc_pos
-        new_head, *tail = tail
-        head += [new_head]
-    return False, []
+    return is_branches(knowledge, elements, is_dp_s, is_specifier_with_advp)
 
 def is_predicate(knowledge, elements):
     '''
@@ -224,16 +202,8 @@ def is_sentence(knowledge, elements):
 
     if len(elements) < 2:
         return False, []
-    head, *tail = elements
-    head = [head]
-    while tail:
-        subj_truth, subj_pos = is_subject(knowledge, head)
-        pred_truth, pred_pos = is_predicate(knowledge, tail)
-        if subj_truth and pred_truth:
-            return True, subj_pos + pred_pos
-        new_head, *tail = tail
-        head += [new_head] 
-    return False, []
+
+    return is_branches(knowledge, elements, is_subject, is_predicate)
 
 def main():
     # Test
