@@ -19,11 +19,11 @@ def main():
     tired_and_ready = knowledge.solve_full(lp.Fact('is tired', '?who'), 
                         lp.Fact('ready for bed', '?who'))
     for t in tired_and_ready:
-        print('{} = tired and ready for bed.'.format(t[0][1]))
+        print(t)
     # Get all elements that are true for a given rule
     ready = knowledge.solve_one(lp.Fact('ready for bed', '?X'))
     for r in ready:
-        print('{} = ready for bed.'.format(r[0][1]))
+        print(r)
 
 
 if __name__ == '__main__':
