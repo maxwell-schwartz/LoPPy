@@ -5,7 +5,8 @@ def is_branches(knowledge, elements, f1, f2):
 
     head, *tail = elements
     head = [head]
-    # Check to see if it is a VP + ADVP
+    # Divide elements
+    # If both functions return True, return True and POS list
     while tail:
         left_truth, left_pos = f1(knowledge, head)
         right_truth, right_pos = f2(knowledge, tail)
@@ -13,6 +14,19 @@ def is_branches(knowledge, elements, f1, f2):
             return True, left_pos + right_pos
         new_head, *tail = tail
         head += [new_head]
+    return False, []
+
+def is_wh_word(knowledge, elements):
+    '''
+    Determine if given set of words is a WH-word
+
+    To Do: deal with preposition cases, e.g. To what...
+    '''
+
+    if len(elements) == 0:
+        return False, []
+    elif len(elements) == 1 and knowledge.is_a(elements, 'WH'):
+        return True, ['WH']
     return False, []
 
 def is_np_s(knowledge, elements):
@@ -47,7 +61,7 @@ def is_dp_s(knowledge, elements):
 
 def is_advp(knowledge, elements):
     '''
-    Determing if given set of words is a series of Adverbs
+    Determin if given set of words is a series of Adverbs
     e.g. "often quickly"
     '''
 
@@ -171,19 +185,6 @@ def is_tr_vp_3_with_specifier(knowledge, elements):
 
     return is_branches(knowledge, elements, is_tr_vp_3, is_specifier_with_advp)
 
-def is_subject(knowledge, elements):
-    '''
-    Determine if given set of words is a viable Subject for a sentence
-    DP | DP + Specifier | DP + Specifier + ADVP
-    '''
-
-    dp_truth, dp_pos = is_dp_s(knowledge, elements)
-    # If it is a standard DP, it is accepted
-    if dp_truth:
-        return True, dp_pos
-    # Check to see if it is a DP + Specifier with ADVP
-    return is_branches(knowledge, elements, is_dp_s, is_specifier_with_advp)
-
 def is_predicate(knowledge, elements):
     '''
     Determine if given set of words is a viable Predicate for a sentence
@@ -197,13 +198,13 @@ def is_predicate(knowledge, elements):
         return True, tr_sp_pos
     return False, []
 
-def is_sentence(knowledge, elements):
-    '''Determine if given set of words is a grammatical sentence'''
+def is_wh_question(knowledge, elements):
+    '''Determine if given set of words is a grammatical wh-question'''
 
     if len(elements) < 2:
         return False, []
 
-    return is_branches(knowledge, elements, is_subject, is_predicate)
+    return is_branches(knowledge, elements, is_wh_word, is_predicate)
 
 def main():
     # Test
@@ -222,6 +223,8 @@ def main():
         determiners = infile.readlines()
     with open('word_lists/specifiers.txt', 'r') as infile:
         specifiers = infile.readlines()
+    with open('word_lists/wh_words.txt', 'r') as infile:
+        wh_words = infile.readlines()
 
     for n in nouns_s:
         knowledge.update_knowledge(lp.Fact('NOUN_S', n.strip()))
@@ -235,8 +238,10 @@ def main():
         knowledge.update_knowledge(lp.Fact('ADV', ad.strip()))
     for d in determiners:
         knowledge.update_knowledge(lp.Fact('DET', d.strip()))
-    for c in specifiers:
-        knowledge.update_knowledge(lp.Fact('SPEC', c.strip()))
+    for s in specifiers:
+        knowledge.update_knowledge(lp.Fact('SPEC', s.strip()))
+    for w in wh_words:
+        knowledge.update_knowledge(lp.Fact('WH', w.strip()))
 
     keep_going = 'y'
     while keep_going == 'y':
@@ -252,7 +257,7 @@ def main():
         # print('TR_VP_3 + Specifier > ', is_tr_vp_3_with_specifier(knowledge, user_sent))
         # print('Subject > ', is_subject(knowledge, user_sent))
         # print('Predicate > ', is_predicate(knowledge, user_sent))
-        print('SENTENCE > ', is_sentence(knowledge, user_sent))
+        print('Wh question > ', is_wh_question(knowledge, user_sent))
         keep_going = input('Continue? (y/n) ')
 
 if __name__ == '__main__':
