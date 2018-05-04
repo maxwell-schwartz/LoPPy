@@ -17,6 +17,7 @@ The primary goal is to use this tool to build a syntactic parser for grammatical
 
 ### Next Steps
 
+* When, Where, Why, How questions
 * Plurals and verb conjugations
 * Recursive sentence structures ("The cat the dog chases chases mice.")
 * Improved tokenization
