@@ -12,7 +12,7 @@ The primary goal is to use this tool to build a syntactic parser for grammatical
 
 * `loppy.py` - The core classes for defining facts
 * `examples.py` - Some examples of useful methods
-* `grammar.py` - The syntactic parser (still a long way to go with this!)
+* `wh_grammar.py` - The current syntactic parser with a focus on wh-questions (still a long way to go with this!)
 * `word_lists/` - Lists of words of various parts of speech for testing
 
 ### Next Steps
