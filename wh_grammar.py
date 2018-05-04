@@ -245,7 +245,7 @@ def main():
 
     keep_going = 'y'
     while keep_going == 'y':
-        user_sent = input('Enter sentence >> ').split()
+        user_sent = input('Enter wh-question >> ').split()
         # print('NP > ', is_np_s(knowledge, user_sent))
         # print('INT_VP_3 > ', is_int_vp_3(knowledge, user_sent))
         # print('TR_VP_3 > ', is_tr_vp_3(knowledge, user_sent))
