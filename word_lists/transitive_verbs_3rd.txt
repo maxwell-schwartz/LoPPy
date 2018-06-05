@@ -2,3 +2,4 @@ eats
 drinks
 finds
 throws
+chases

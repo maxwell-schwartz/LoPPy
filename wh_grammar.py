@@ -101,7 +101,8 @@ def is_dp_s(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'DET'):
         truth, pos_list = is_np_s(knowledge, tail)
-        return truth, ['DET'] + pos_list
+        if truth:
+            return True, ['DET'] + pos_list
     return False, []
 
 def is_dp_p(knowledge, elements):
@@ -115,7 +116,8 @@ def is_dp_p(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'DET'):
         truth, pos_list = is_np_p(knowledge, tail)
-        return truth, ['DET'] + pos_list
+        if truth:
+            return True, ['DET'] + pos_list
     return False, []
 
 def is_dp(knowledge, elements):
@@ -524,26 +526,34 @@ def is_specifier_with_advp(knowledge, elements):
     # Check to see if it is a Specifier + ADVP
     return is_branches(knowledge, elements, is_specifier_phrase, is_advp)
 
-# def is_tr_vp_3_with_specifier(knowledge, elements):
-#     '''
-#     Determine if given set of words is a transitive VP with an optional Specifier
-#     e.g. "eats the bird that eats the food"
-#     '''
+def is_tr_vp_3_with_specifier(knowledge, elements):
+    '''
+    Determine if given set of words is a transitive VP with an optional Specifier
+    e.g. "eats the bird that eats the food"
+    '''
 
-#     return is_branches(knowledge, elements, is_tr_vp_3, is_specifier_with_advp)
+    if len(elements) < 2:
+        return False, []
+    head, *tail = elements
+    if knowledge.is_a([head], 'TR_VERB_3'):
+        truth, pos_list = is_specifier_with_advp(knowledge, tail)
+        if truth:
+            return True, ['TR_VERB_3'] + pos_list
+    return False, []
 
 def is_subject(knowledge, elements):
     '''
     Determine if given set of words is a viable Subject for a sentence
-    DP | DP + Specifier | DP + Specifier + ADVP
+    DP | Specifier Phrase | Specifier Phrase + ADVP
     '''
 
-    dp_truth, dp_pos = is_dp_s(knowledge, elements)
-    # If it is a standard DP, it is accepted
+    dp_truth, dp_pos = is_dp(knowledge, elements)
+    spec_truth, spec_pos = is_specifier_with_advp(knowledge, elements)
     if dp_truth:
         return True, dp_pos
-    # Check to see if it is a DP + Specifier with ADVP
-    return is_branches(knowledge, elements, is_dp_s, is_specifier_with_advp)
+    elif spec_truth:
+        return True, spec_pos
+    return False, []
 
 def is_predicate(knowledge, elements):
     '''
@@ -558,10 +568,10 @@ def is_predicate(knowledge, elements):
         return True, tr_sp_pos
     return False, []
 
-def is_aux_phrase(knowledge, elements):
+def is_int_aux_phrase(knowledge, elements):
     '''
-    Determine if a given set of words is an auxiliary verb phrase
-    e.g. "does the bird eat"
+    Determine if a given set of words is an Intransitive Auxiliary Verb Phrase
+    e.g. "does the bird sleep"
     '''
 
     if len(elements) < 3:
@@ -571,6 +581,31 @@ def is_aux_phrase(knowledge, elements):
     if aux_truth:
         return True, aux_pos
     return False, []
+
+def is_tr_aux_phrase(knowledge, elements):
+    '''
+    Determine if a given set of words is a Transitive Auxiliary Verb Phrase
+    e.g. "does the bird throw"
+    '''
+
+    if len(elements) < 3:
+        return False, []
+
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux, is_subject, is_tr_vp_1)
+    if aux_truth:
+        return True, aux_pos
+    return False, []
+
+def is_aux_phrase(knowledge, elements):
+    '''
+    Determine if given set of words is any complete Auxiliary Verb Phrase
+    Transitive or Intransitive
+    '''
+
+    int_truth, int_pos = is_int_aux_phrase(knowledge, elements)
+    if int_truth:
+        return True, int_pos
+    return is_branches(knowledge, elements, is_tr_aux_phrase, is_subject)
 
 def is_wh_question(knowledge, elements):
     '''
@@ -661,14 +696,15 @@ def main():
         # print('SPEC_with_TR_V_3 > ', is_specifier_with_tr_verb_3(knowledge, user_sent))
         # print('SPEC_with_INT_V_1 > ', is_specifier_with_int_verb_1(knowledge, user_sent))
         # print('SPEC_with_INT_V_3 > ', is_specifier_with_int_verb_3(knowledge, user_sent))
-        print('Specifier Phrase > ', is_specifier_phrase(knowledge, user_sent))
+        # print('Specifier Phrase > ', is_specifier_phrase(knowledge, user_sent))
         # print('Specifier + ADVP > ', is_specifier_with_advp(knowledge, user_sent))
         # print('DP_S_with_SPEC', is_dp_s_with_spec_and_tr_verb(knowledge, user_sent))
         # print('DP_P_with_SPEC', is_dp_p_with_spec_and_tr_verb(knowledge, user_sent))
         # print('TR_VP_3 + Specifier > ', is_tr_vp_3_with_specifier(knowledge, user_sent))
         # print('Subject > ', is_subject(knowledge, user_sent))
         # print('Predicate > ', is_predicate(knowledge, user_sent))
-        # print('Wh question > ', is_wh_question(knowledge, user_sent))
+        # print('AUX > ', is_aux_phrase(knowledge, user_sent))
+        print('Wh question > ', is_wh_question(knowledge, user_sent))
         keep_going = input('Continue? (y/n) ')
 
 if __name__ == '__main__':
