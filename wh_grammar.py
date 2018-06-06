@@ -150,11 +150,18 @@ def is_advp(knowledge, elements):
         return truth, ['ADV'] + pos_list
     return False, []
 
-def is_aux(knowledge, elements):
-    '''Determine if a given set of words is an Auxiliary Verb'''
+def is_aux_s(knowledge, elements):
+    '''Determine if a given set of words is an Singular Auxiliary Verb'''
 
-    if len(elements) == 1 and knowledge.is_a(elements, 'AUX'):
-        return True, ['AUX']
+    if len(elements) == 1 and knowledge.is_a(elements, 'AUX_S'):
+        return True, ['AUX_S']
+    return False, []
+
+def is_aux_p(knowledge, elements):
+    '''Determine if a given set of words is an Plural Auxiliary Verb'''
+
+    if len(elements) == 1 and knowledge.is_a(elements, 'AUX_P'):
+        return True, ['AUX_P']
     return False, []
 
 def is_int_vp_1(knowledge, elements):
@@ -512,6 +519,78 @@ def is_specifier_phrase(knowledge, elements):
         return True, nested_pos
     return False, []
 
+def is_specifier_phrase_s(knowledge, elements):
+    '''
+    Determine if given set of words is a Singular Specifier Phrase
+    e.g. "the cat that eats the bird"
+    '''
+
+    if len(elements) < 3:
+        return False, []
+    # Any single Intransitive Phrase will work
+    int_truth, int_pos = is_dp_s_with_spec_and_int_verb(knowledge, elements)
+    if int_truth:
+        return True, int_pos
+    tr_truth, tr_pos = is_branches(knowledge, elements, 
+                                   is_dp_s_with_spec_and_tr_verb, is_spec_ender)
+    if tr_truth:
+        return True, tr_pos
+    nested_truth, nested_pos = is_branches(knowledge, elements, 
+                                           is_dp_s_with_spec_and_tr_verb, is_specifier_phrase)
+    if nested_truth:
+        return True, nested_pos
+    return False, []
+
+def is_specifier_phrase_p(knowledge, elements):
+    '''
+    Determine if given set of words is a Plural Specifier Phrase
+    e.g. "the cats that eat the bird"
+    '''
+
+    if len(elements) < 3:
+        return False, []
+    # Any single Intransitive Phrase will work
+    int_truth, int_pos = is_dp_p_with_spec_and_int_verb(knowledge, elements)
+    if int_truth:
+        return True, int_pos
+    tr_truth, tr_pos = is_branches(knowledge, elements, 
+                                   is_dp_p_with_spec_and_tr_verb, is_spec_ender)
+    if tr_truth:
+        return True, tr_pos
+    nested_truth, nested_pos = is_branches(knowledge, elements, 
+                                           is_dp_p_with_spec_and_tr_verb, is_specifier_phrase)
+    if nested_truth:
+        return True, nested_pos
+    return False, []
+
+def is_specifier_s_with_advp(knowledge, elements):
+    '''
+    Determine if given set of words is a Singular Specifier followed by any number of adverbs
+    This includes 0 adverbs
+    e.g. "the cat that eats the bird that eats the food quickly"
+    '''
+
+    sp_truth, sp_pos = is_specifier_phrase_s(knowledge, elements)
+    # If it is a standard Specifier Phrase, it is accepted
+    if sp_truth:
+        return True, sp_pos
+    # Check to see if it is a Specifier + ADVP
+    return is_branches(knowledge, elements, is_specifier_phrase_s, is_advp)
+
+def is_specifier_p_with_advp(knowledge, elements):
+    '''
+    Determine if given set of words is a Plural Specifier followed by any number of adverbs
+    This includes 0 adverbs
+    e.g. "the cats that eat the bird that eats the food quickly"
+    '''
+
+    sp_truth, sp_pos = is_specifier_phrase_p(knowledge, elements)
+    # If it is a standard Specifier Phrase, it is accepted
+    if sp_truth:
+        return True, sp_pos
+    # Check to see if it is a Specifier + ADVP
+    return is_branches(knowledge, elements, is_specifier_phrase_p, is_advp)
+
 def is_specifier_with_advp(knowledge, elements):
     '''
     Determine if given set of words is a Specifier followed by any number of adverbs
@@ -541,6 +620,34 @@ def is_tr_vp_3_with_specifier(knowledge, elements):
             return True, ['TR_VERB_3'] + pos_list
     return False, []
 
+def is_subject_s(knowledge, elements):
+    '''
+    Determine if given set of words is a viable Singular Subject for a sentence
+    DP | Specifier Phrase | Specifier Phrase + ADVP
+    '''
+
+    dp_truth, dp_pos = is_dp_s(knowledge, elements)
+    spec_truth, spec_pos = is_specifier_s_with_advp(knowledge, elements)
+    if dp_truth:
+        return True, dp_pos
+    elif spec_truth:
+        return True, spec_pos
+    return False, []
+
+def is_subject_p(knowledge, elements):
+    '''
+    Determine if given set of words is a viable Plural Subject for a sentence
+    DP | Specifier Phrase | Specifier Phrase + ADVP
+    '''
+
+    dp_truth, dp_pos = is_dp_p(knowledge, elements)
+    spec_truth, spec_pos = is_specifier_p_with_advp(knowledge, elements)
+    if dp_truth:
+        return True, dp_pos
+    elif spec_truth:
+        return True, spec_pos
+    return False, []
+
 def is_subject(knowledge, elements):
     '''
     Determine if given set of words is a viable Subject for a sentence
@@ -558,7 +665,7 @@ def is_subject(knowledge, elements):
 def is_predicate(knowledge, elements):
     '''
     Determine if given set of words is a viable Predicate for a sentence
-    VP | VP + ADVP | Int_VP + Specifier | Int_VP + Specifier + ADVP
+    VP | VP + ADVP | Tr_VP + Specifier | Tr_VP + Specifier + ADVP
     '''
     vp_truth, vp_pos = is_simple_vp_3_with_advp(knowledge, elements)
     tr_sp_truth, tr_sp_pos = is_tr_vp_3_with_specifier(knowledge, elements)
@@ -568,32 +675,88 @@ def is_predicate(knowledge, elements):
         return True, tr_sp_pos
     return False, []
 
-def is_int_aux_phrase(knowledge, elements):
+def is_int_aux_phrase_s(knowledge, elements):
     '''
-    Determine if a given set of words is an Intransitive Auxiliary Verb Phrase
+    Determine if a given set of words is a Singular Intransitive Auxiliary Verb Phrase
     e.g. "does the bird sleep"
     '''
 
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux, is_subject, is_int_vp_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_int_vp_1)
     if aux_truth:
         return True, aux_pos
     return False, []
 
-def is_tr_aux_phrase(knowledge, elements):
+def is_int_aux_phrase_p(knowledge, elements):
     '''
-    Determine if a given set of words is a Transitive Auxiliary Verb Phrase
+    Determine if a given set of words is a Plural Intransitive Auxiliary Verb Phrase
+    e.g. "do the birds sleep"
+    '''
+
+    if len(elements) < 3:
+        return False, []
+
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_p, is_subject_p, is_int_vp_1)
+    if aux_truth:
+        return True, aux_pos
+    return False, []
+
+def is_int_aux_phrase(knowledge, elements):
+    '''
+    Determine if a given set of words is any Intransitive Auxiliary Verb Phrase
+    Singular or Plural
+    '''
+
+    s_truth, s_pos = is_int_aux_phrase_s(knowledge, elements)
+    p_truth, p_pos = is_int_aux_phrase_p(knowledge, elements)
+    if s_truth:
+        return True, s_pos
+    elif p_truth:
+        return True, p_pos
+    return False, []
+
+def is_tr_aux_phrase_s(knowledge, elements):
+    '''
+    Determine if a given set of words is a Singular Transitive Auxiliary Verb Phrase
     e.g. "does the bird throw"
     '''
 
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux, is_subject, is_tr_vp_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_tr_vp_1)
     if aux_truth:
         return True, aux_pos
+    return False, []
+
+def is_tr_aux_phrase_p(knowledge, elements):
+    '''
+    Determine if a given set of words is a Plural Transitive Auxiliary Verb Phrase
+    e.g. "do the birds throw"
+    '''
+
+    if len(elements) < 3:
+        return False, []
+
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_p, is_subject_p, is_tr_vp_1)
+    if aux_truth:
+        return True, aux_pos
+    return False, []
+
+def is_tr_aux_phrase(knowledge, elements):
+    '''
+    Determine if a given set of words is any Transitive Auxiliary Verb Phrase
+    Singular or Plural
+    '''
+
+    s_truth, s_pos = is_tr_aux_phrase_s(knowledge, elements)
+    p_truth, p_pos = is_tr_aux_phrase_p(knowledge, elements)
+    if s_truth:
+        return True, s_pos
+    elif p_truth:
+        return True, p_pos
     return False, []
 
 def is_aux_phrase(knowledge, elements):
@@ -638,8 +801,10 @@ def main():
         int_verbs_1 = infile.readlines()
     with open('word_lists/intransitive_verbs_3rd.txt', 'r') as infile:
         int_verbs_3 = infile.readlines()
-    with open('word_lists/auxiliary_verbs.txt', 'r') as infile:
-        aux_verbs = infile.readlines()
+    with open('word_lists/auxiliary_verbs_singular.txt', 'r') as infile:
+        aux_verbs_s = infile.readlines()
+    with open('word_lists/auxiliary_verbs_plural.txt', 'r') as infile:
+        aux_verbs_p = infile.readlines()
     with open('word_lists/adjectives.txt', 'r') as infile:
         adjectives = infile.readlines()
     with open('word_lists/adverbs.txt', 'r') as infile:
@@ -665,8 +830,10 @@ def main():
         knowledge.update_knowledge(lp.Fact('INT_VERB_1', i1.strip()))
     for i3 in int_verbs_3:
         knowledge.update_knowledge(lp.Fact('INT_VERB_3', i3.strip()))
-    for aux in aux_verbs:
-        knowledge.update_knowledge(lp.Fact('AUX', aux.strip()))
+    for aux_s in aux_verbs_s:
+        knowledge.update_knowledge(lp.Fact('AUX_S', aux_s.strip()))
+    for aux_p in aux_verbs_p:
+        knowledge.update_knowledge(lp.Fact('AUX_P', aux_p.strip()))
     for adj in adjectives:
         knowledge.update_knowledge(lp.Fact('ADJ', adj.strip()))
     for adv in adverbs:
