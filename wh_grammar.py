@@ -451,7 +451,6 @@ def is_dp_with_spec_and_tr_verb(knowledge, elements):
         return True, p_pos
     return False, []
 
-
 def is_dp_s_with_spec_and_int_verb(knowledge, elements):
     '''
     Determine if given set of words is a Singular Determiner Phrase
@@ -726,7 +725,7 @@ def is_tr_aux_phrase_s(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_tr_vp_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_advp_with_tr_v_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -740,7 +739,7 @@ def is_tr_aux_phrase_p(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_p, is_subject_p, is_tr_vp_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_p, is_subject_p, is_advp_with_tr_v_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -863,13 +862,16 @@ def main():
         # print('SPEC_with_TR_V_3 > ', is_specifier_with_tr_verb_3(knowledge, user_sent))
         # print('SPEC_with_INT_V_1 > ', is_specifier_with_int_verb_1(knowledge, user_sent))
         # print('SPEC_with_INT_V_3 > ', is_specifier_with_int_verb_3(knowledge, user_sent))
+        # print('SPEC Singuler > ', is_specifier_phrase_s(knowledge, user_sent))
         # print('Specifier Phrase > ', is_specifier_phrase(knowledge, user_sent))
         # print('Specifier + ADVP > ', is_specifier_with_advp(knowledge, user_sent))
         # print('DP_S_with_SPEC', is_dp_s_with_spec_and_tr_verb(knowledge, user_sent))
         # print('DP_P_with_SPEC', is_dp_p_with_spec_and_tr_verb(knowledge, user_sent))
         # print('TR_VP_3 + Specifier > ', is_tr_vp_3_with_specifier(knowledge, user_sent))
         # print('Subject > ', is_subject(knowledge, user_sent))
+        # print('Subject Singular > ', is_subject_s(knowledge, user_sent))
         # print('Predicate > ', is_predicate(knowledge, user_sent))
+        # print('Trans Aux Phrase S > ', is_tr_aux_phrase_s(knowledge, user_sent))
         # print('AUX > ', is_aux_phrase(knowledge, user_sent))
         print('Wh question > ', is_wh_question(knowledge, user_sent))
         keep_going = input('Continue? (y/n) ')
