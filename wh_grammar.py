@@ -26,13 +26,12 @@ def is_wrapped(knowledge, elements, f1, f2, f3):
     e.g. "does the bird eat"
     '''
 
-    head, *middle, end = elements
-    head, end = [head], [end]
+    head, *tail = elements
+    head = [head]
     head_truth, head_pos = f1(knowledge, head)
-    middle_truth, middle_pos = f2(knowledge, middle)
-    end_truth, end_pos = f3(knowledge, end)
-    if head_truth and middle_truth and end_truth:
-        return True, head_pos + middle_pos + end_pos
+    tail_truth, tail_pos = is_branches(knowledge, tail, f2, f3)
+    if head_truth and tail_truth:
+        return True, head_pos + tail_pos
     return False, []
 
 def is_wh_word(knowledge, elements):
@@ -684,6 +683,7 @@ def is_int_aux_phrase_s(knowledge, elements):
         return False, []
 
     aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_int_vp_1)
+    print(aux_truth)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -867,10 +867,12 @@ def main():
         # print('Specifier + ADVP > ', is_specifier_with_advp(knowledge, user_sent))
         # print('DP_S_with_SPEC', is_dp_s_with_spec_and_tr_verb(knowledge, user_sent))
         # print('DP_P_with_SPEC', is_dp_p_with_spec_and_tr_verb(knowledge, user_sent))
+        # print('DP_with_SPEC_and_TR_VERB', is_dp_with_spec_and_tr_verb(knowledge, user_sent))
         # print('TR_VP_3 + Specifier > ', is_tr_vp_3_with_specifier(knowledge, user_sent))
         # print('Subject > ', is_subject(knowledge, user_sent))
         # print('Subject Singular > ', is_subject_s(knowledge, user_sent))
         # print('Predicate > ', is_predicate(knowledge, user_sent))
+        # print('Int Aux Phrase S > ', is_int_aux_phrase_s(knowledge, user_sent))
         # print('Trans Aux Phrase S > ', is_tr_aux_phrase_s(knowledge, user_sent))
         # print('AUX > ', is_aux_phrase(knowledge, user_sent))
         print('Wh question > ', is_wh_question(knowledge, user_sent))
