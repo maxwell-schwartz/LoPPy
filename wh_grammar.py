@@ -683,7 +683,6 @@ def is_int_aux_phrase_s(knowledge, elements):
         return False, []
 
     aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_int_vp_1)
-    print(aux_truth)
     if aux_truth:
         return True, aux_pos
     return False, []
