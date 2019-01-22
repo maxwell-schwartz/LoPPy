@@ -13,7 +13,7 @@ def main():
     # Get all the "types" or rules the given element list satisfies
     print('Types of "Max" > ', knowledge.get_types(['Max']))
     # Find out whether or not a given element list satisfies a rule
-    print('Is is true that "Most People" satisfies the rule "ready for bed"? ', 
+    print('Is it true that "Most People" satisfies the rule "ready for bed"? ', 
            knowledge.is_a(['Most People'], 'ready for bed'))
     # Get all elements that are true for a given set of rules
     tired_and_ready = knowledge.solve_full(lp.Fact('is tired', '?who'), 

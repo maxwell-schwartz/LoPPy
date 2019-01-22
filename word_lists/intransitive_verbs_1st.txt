@@ -1,0 +1,4 @@
+eat
+dance
+smoke
+sleep
