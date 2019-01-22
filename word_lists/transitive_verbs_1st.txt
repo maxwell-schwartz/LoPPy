@@ -2,3 +2,4 @@ eat
 drink
 find
 throw
+chase
