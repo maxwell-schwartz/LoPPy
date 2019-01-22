@@ -777,9 +777,12 @@ def is_wh_question(knowledge, elements):
         return False, []
 
     subj_truth, subj_pos = is_branches(knowledge, elements, is_wh_subject_word, is_predicate)
+    int_aux_truth, int_aux_pos = is_branches(knowledge, elements, is_wh_subject_word, is_int_aux_phrase)
     aux_truth, aux_pos = is_branches(knowledge, elements, is_wh_word, is_aux_phrase)
     if subj_truth:
         return True, subj_pos
+    elif int_aux_truth:
+        return True, int_aux_pos
     elif aux_truth:
         return True, aux_pos
     return False, []
