@@ -787,6 +787,19 @@ def is_wh_question(knowledge, elements):
         return True, aux_pos
     return False, []
 
+def is_wh_question_with_adv(knowledge, elements):
+    '''
+    Determine if given set of words is a wh-question plus 0 or 1 adverbs
+    e.g. "what does the bird eat quickly"
+    '''
+
+    *head, tail = elements
+    wh_question_truth, wh_question_pos = is_wh_question(knowledge, head)
+    if wh_question_truth and knowledge.is_a([tail], 'ADV'):
+        return wh_question_pos + ['ADV']
+
+    return is_wh_question(knowledge, elements)
+
 def main():
     # Test
     knowledge = lp.FactTracker()
@@ -877,7 +890,8 @@ def main():
         # print('Int Aux Phrase S > ', is_int_aux_phrase_s(knowledge, user_sent))
         # print('Trans Aux Phrase S > ', is_tr_aux_phrase_s(knowledge, user_sent))
         # print('AUX > ', is_aux_phrase(knowledge, user_sent))
-        print('Wh question > ', is_wh_question(knowledge, user_sent))
+        # print('Wh question > ', is_wh_question(knowledge, user_sent))
+        print('Wh question >', is_wh_question_with_adv(knowledge, user_sent))
         keep_going = input('Continue? (y/n) ')
 
 if __name__ == '__main__':
