@@ -1,5 +1,3 @@
-# First attempt at LOgically Parsing with PYthon
-
 class FactTracker(object):
     def __init__(self):
         # Initialize empty dict of name: elements
