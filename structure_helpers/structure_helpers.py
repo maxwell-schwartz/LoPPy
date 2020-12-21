@@ -1,5 +1,5 @@
 def is_branches(knowledge, elements, f1, f2):
-    '''Determine if given set of words is combo of two types'''
+    """Determine if given set of words is combo of two types"""
 
     head, *tail = elements
     head = [head]
@@ -16,14 +16,14 @@ def is_branches(knowledge, elements, f1, f2):
 
 
 def is_wrapped(knowledge, elements, f1, f2, f3):
-    '''
+    """
     Determine if a given set of words is a combo of three types,
     one embedded between two others.
 
     This is relevant for cases of auxiliary verbs agreeing with
     other verbs:
     e.g. "does the bird eat"
-    '''
+    """
 
     head, *tail = elements
     head = [head]
