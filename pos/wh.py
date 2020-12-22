@@ -2,7 +2,7 @@ def is_wh_word(knowledge, elements):
     """
     Determine if given set of words is a WH-word
 
-    To Do: deal with preposition cases, e.g. To what...
+    ToDo: deal with preposition cases, e.g. To what...
     """
 
     if len(elements) == 0:
