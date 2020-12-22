@@ -1,88 +1,8 @@
 import loppy as lp
+from pos.determiner_phrases import is_dp_s, is_dp_p, is_dp
 
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_np_s(knowledge, elements):
-    """
-    Determine if a given set of words is a Singular Noun Phrase
-    e.g. "small blue dog"
-    """
-
-    if len(elements) == 0:
-        return False, []
-    elif len(elements) == 1 and knowledge.is_a(elements, 'NOUN_S'):
-        return True, ['NOUN_S']
-    head, *tail = elements
-    if knowledge.is_a([head], 'ADJ'):
-        truth, pos_list = is_np_s(knowledge, tail)
-        return truth, ['ADJ'] + pos_list
-    return False, []
-
-
-def is_np_p(knowledge, elements):
-    """
-    Determine if a given set of words is a Plural Noun Phrase
-    e.g. "small blue dogs"
-    """
-
-    if len(elements) == 0:
-        return False, []
-    elif len(elements) == 1 and knowledge.is_a(elements, 'NOUN_P'):
-        return True, ['NOUN_P']
-    head, *tail = elements
-    if knowledge.is_a([head], 'ADJ'):
-        truth, pos_list = is_np_p(knowledge, tail)
-        return truth, ['ADJ'] + pos_list
-    return False, []
-
-
-def is_dp_s(knowledge, elements):
-    """
-    Determine if a given set of words in a Singular Determiner Phrase
-    e.g. "the small blue dog"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'DET'):
-        truth, pos_list = is_np_s(knowledge, tail)
-        if truth:
-            return True, ['DET'] + pos_list
-    return False, []
-
-
-def is_dp_p(knowledge, elements):
-    """
-    Determine if a given set of words in a Singular Determiner Phrase
-    e.g. "the small blue dogs"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'DET'):
-        truth, pos_list = is_np_p(knowledge, tail)
-        if truth:
-            return True, ['DET'] + pos_list
-    return False, []
-
-
-def is_dp(knowledge, elements):
-    """
-    Determine if given set of words is any type of Determiner Phrase
-    Singular or Plural
-    """
-
-    s_truth, s_pos = is_dp_s(knowledge, elements)
-    p_truth, p_pos = is_dp_p(knowledge, elements)
-    if s_truth:
-        return True, s_pos
-    elif p_truth:
-        return True, p_pos
-    return False, []
 
 
 def is_advp(knowledge, elements):
