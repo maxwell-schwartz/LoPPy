@@ -1,25 +1,10 @@
 import loppy as lp
 from pos.adverbs import is_adverbs
+from pos.auxiliary import is_aux_singular, is_aux_plural
 from pos.determiner_phrases import is_determiner_phrase_singular, is_determiner_phrase_plural, is_dp
 
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_aux_s(knowledge, elements):
-    """Determine if a given set of words is a Singular Auxiliary Verb"""
-
-    if len(elements) == 1 and knowledge.is_a(elements, 'AUX_S'):
-        return True, ['AUX_S']
-    return False, []
-
-
-def is_aux_p(knowledge, elements):
-    """Determine if a given set of words is a Plural Auxiliary Verb"""
-
-    if len(elements) == 1 and knowledge.is_a(elements, 'AUX_P'):
-        return True, ['AUX_P']
-    return False, []
 
 
 def is_int_vp_1(knowledge, elements):
@@ -574,7 +559,7 @@ def is_int_aux_phrase_s(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_int_vp_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_singular, is_subject_s, is_int_vp_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -589,7 +574,7 @@ def is_int_aux_phrase_p(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_p, is_subject_p, is_int_vp_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_plural, is_subject_p, is_int_vp_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -619,7 +604,7 @@ def is_tr_aux_phrase_s(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_adverbs_with_tr_v_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_singular, is_subject_s, is_adverbs_with_tr_v_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -634,7 +619,7 @@ def is_tr_aux_phrase_p(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_p, is_subject_p, is_adverbs_with_tr_v_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_plural, is_subject_p, is_adverbs_with_tr_v_1)
     if aux_truth:
         return True, aux_pos
     return False, []
