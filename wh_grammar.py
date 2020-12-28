@@ -1,25 +1,9 @@
 import loppy as lp
+from pos.adverbs import is_adverbs
 from pos.determiner_phrases import is_determiner_phrase_singular, is_determiner_phrase_plural, is_dp
 
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_advp(knowledge, elements):
-    """
-    Determine if given set of words is a series of Adverbs
-    e.g. "often quickly"
-    """
-
-    if len(elements) == 0:
-        return False, []
-    elif len(elements) == 1 and knowledge.is_a(elements, 'ADV'):
-        return True, ['ADV']
-    head, *tail = elements
-    if knowledge.is_a([head], 'ADV'):
-        truth, pos_list = is_advp(knowledge, tail)
-        return truth, ['ADV'] + pos_list
-    return False, []
 
 
 def is_aux_s(knowledge, elements):
@@ -83,7 +67,7 @@ def is_int_vp_3(knowledge, elements):
     return False, []
 
 
-def is_advp_with_tr_v_1(knowledge, elements):
+def is_adverbs_with_tr_v_1(knowledge, elements):
     """
     Determine if given set of words is an adverb phrase followed by a 1st
     Person Transitive Verb
@@ -98,13 +82,13 @@ def is_advp_with_tr_v_1(knowledge, elements):
             return True, ['TR_VERB_1']
         return False, []
     *head, tail = elements
-    adv_truth, adv_pos = is_advp(knowledge, head)
+    adv_truth, adv_pos = is_adverbs(knowledge, head)
     if adv_truth and knowledge.is_a([tail], 'TR_VERB_1'):
         return True, adv_pos + ['TR_VERB_1']
     return False, []
 
 
-def is_advp_with_tr_v_3(knowledge, elements):
+def is_adverbs_with_tr_v_3(knowledge, elements):
     """
     Determine if given set of words is an adverb phrase followed by a 3rd
     Person Transitive Verb
@@ -119,7 +103,7 @@ def is_advp_with_tr_v_3(knowledge, elements):
             return True, ['TR_VERB_3']
         return False, []
     *head, tail = elements
-    adv_truth, adv_pos = is_advp(knowledge, head)
+    adv_truth, adv_pos = is_adverbs(knowledge, head)
     if adv_truth and knowledge.is_a([tail], 'TR_VERB_3'):
         return True, adv_pos + ['TR_VERB_3']
     return False, []
@@ -217,7 +201,7 @@ def is_simple_vp_1_with_advp(knowledge, elements):
     if vp_truth:
         return True, vp_pos
     # Check to see if it is a VP + ADVP
-    return is_branches(knowledge, elements, is_simple_vp_1, is_advp)
+    return is_branches(knowledge, elements, is_simple_vp_1, is_adverbs)
 
 
 def is_simple_vp_3_with_advp(knowledge, elements):
@@ -232,7 +216,7 @@ def is_simple_vp_3_with_advp(knowledge, elements):
     if vp_truth:
         return True, vp_pos
     # Check to see if it is a VP + ADVP
-    return is_branches(knowledge, elements, is_simple_vp_3, is_advp)
+    return is_branches(knowledge, elements, is_simple_vp_3, is_adverbs)
 
 
 def is_specifier_with_tr_verb_1(knowledge, elements):
@@ -247,7 +231,7 @@ def is_specifier_with_tr_verb_1(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'SPEC'):
         # Check if words following specifier are a transitive verb phrase
-        tr_truth, tr_pos_list = is_advp_with_tr_v_1(knowledge, tail)
+        tr_truth, tr_pos_list = is_adverbs_with_tr_v_1(knowledge, tail)
         if tr_truth:
             return True, ['SPEC'] + tr_pos_list
     return False, []
@@ -265,7 +249,7 @@ def is_specifier_with_tr_verb_3(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'SPEC'):
         # Check if words following specifier are an transitive verb phrase
-        tr_truth, tr_pos_list = is_advp_with_tr_v_3(knowledge, tail)
+        tr_truth, tr_pos_list = is_adverbs_with_tr_v_3(knowledge, tail)
         if tr_truth:
             return True, ['SPEC'] + tr_pos_list
     return False, []
@@ -473,7 +457,7 @@ def is_specifier_s_with_advp(knowledge, elements):
     if sp_truth:
         return True, sp_pos
     # Check to see if it is a Specifier + ADVP
-    return is_branches(knowledge, elements, is_specifier_phrase_s, is_advp)
+    return is_branches(knowledge, elements, is_specifier_phrase_s, is_adverbs)
 
 
 def is_specifier_p_with_advp(knowledge, elements):
@@ -488,7 +472,7 @@ def is_specifier_p_with_advp(knowledge, elements):
     if sp_truth:
         return True, sp_pos
     # Check to see if it is a Specifier + ADVP
-    return is_branches(knowledge, elements, is_specifier_phrase_p, is_advp)
+    return is_branches(knowledge, elements, is_specifier_phrase_p, is_adverbs)
 
 
 def is_specifier_with_advp(knowledge, elements):
@@ -503,7 +487,7 @@ def is_specifier_with_advp(knowledge, elements):
     if sp_truth:
         return True, sp_pos
     # Check to see if it is a Specifier + ADVP
-    return is_branches(knowledge, elements, is_specifier_phrase, is_advp)
+    return is_branches(knowledge, elements, is_specifier_phrase, is_adverbs)
 
 
 def is_tr_vp_3_with_specifier(knowledge, elements):
@@ -635,7 +619,7 @@ def is_tr_aux_phrase_s(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_advp_with_tr_v_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_s, is_subject_s, is_adverbs_with_tr_v_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -650,7 +634,7 @@ def is_tr_aux_phrase_p(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_p, is_subject_p, is_advp_with_tr_v_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_p, is_subject_p, is_adverbs_with_tr_v_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -784,9 +768,6 @@ def main():
         # print('INT_VP_1 > ', is_int_vp_1(knowledge, user_sent))
         # print('INT_VP_3 > ', is_int_vp_3(knowledge, user_sent))
         # print('TR_VP_3 > ', is_tr_vp_3(knowledge, user_sent))
-        # print('ADVP_with_TR_V_1', is_advp_with_tr_v_1(knowledge, user_sent))
-        # print('ADVP_with_TR_V_3', is_advp_with_tr_v_3(knowledge, user_sent))
-        # print('ADVP > ', is_advp(knowledge, user_sent))
         # print('VP_3 + ADVP > ', is_simple_vp_3_with_advp(knowledge, user_sent))
         # print('SPEC_with_TR_V_1 > ', is_specifier_with_tr_verb_1(knowledge, user_sent))
         # print('SPEC_with_TR_V_3 > ', is_specifier_with_tr_verb_3(knowledge, user_sent))
