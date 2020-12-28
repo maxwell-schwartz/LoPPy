@@ -1,5 +1,5 @@
 import loppy as lp
-from pos.determiner_phrases import is_dp_s, is_dp_p, is_dp
+from pos.determiner_phrases import is_determiner_phrase_singular, is_determiner_phrase_plural, is_dp
 
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
@@ -23,7 +23,7 @@ def is_advp(knowledge, elements):
 
 
 def is_aux_s(knowledge, elements):
-    """Determine if a given set of words is an Singular Auxiliary Verb"""
+    """Determine if a given set of words is a Singular Auxiliary Verb"""
 
     if len(elements) == 1 and knowledge.is_a(elements, 'AUX_S'):
         return True, ['AUX_S']
@@ -31,7 +31,7 @@ def is_aux_s(knowledge, elements):
 
 
 def is_aux_p(knowledge, elements):
-    """Determine if a given set of words is an Plural Auxiliary Verb"""
+    """Determine if a given set of words is a Plural Auxiliary Verb"""
 
     if len(elements) == 1 and knowledge.is_a(elements, 'AUX_P'):
         return True, ['AUX_P']
@@ -137,7 +137,7 @@ def is_tr_vp_1(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'TR_VERB_1'):
         # Check if words following the transitive verb are a DP
-        dp_truth, dp_pos_list = is_dp_p(knowledge, tail)
+        dp_truth, dp_pos_list = is_determiner_phrase_plural(knowledge, tail)
         if dp_truth:
             return True, ['TR_VERB_1'] + dp_pos_list
     elif knowledge.is_a([head], 'ADV'):
@@ -159,7 +159,7 @@ def is_tr_vp_3(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'TR_VERB_3'):
         # Check if words following the transitive verb are a DP
-        dp_truth, dp_pos_list = is_dp_s(knowledge, tail)
+        dp_truth, dp_pos_list = is_determiner_phrase_singular(knowledge, tail)
         if dp_truth:
             return True, ['TR_VERB_3'] + dp_pos_list
     elif knowledge.is_a([head], 'ADV'):
@@ -307,24 +307,24 @@ def is_specifier_with_int_verb_3(knowledge, elements):
     return False, []
 
 
-def is_dp_s_with_spec_and_tr_verb(knowledge, elements):
+def is_determiner_phrase_singular_with_spec_and_tr_verb(knowledge, elements):
     """
     Determine if given set of words is a Singular Determiner Phrase
     with a Specifier and 3rd Person Transitive Verb
     e.g. "the cat that quickly throws"
     """
 
-    return is_branches(knowledge, elements, is_dp_s, is_specifier_with_tr_verb_3)
+    return is_branches(knowledge, elements, is_determiner_phrase_singular, is_specifier_with_tr_verb_3)
 
 
-def is_dp_p_with_spec_and_tr_verb(knowledge, elements):
+def is_determiner_phrase_plural_with_spec_and_tr_verb(knowledge, elements):
     """
     Determine if given set of words is a Plural Determiner Phrase
     with a Specifier and 1st Person Transitive Verb
     e.g. "the cats that quickly throw"
     """
 
-    return is_branches(knowledge, elements, is_dp_p, is_specifier_with_tr_verb_1)
+    return is_branches(knowledge, elements, is_determiner_phrase_plural, is_specifier_with_tr_verb_1)
 
 
 def is_dp_with_spec_and_tr_verb(knowledge, elements):
@@ -334,8 +334,8 @@ def is_dp_with_spec_and_tr_verb(knowledge, elements):
     Singular or Plural
     """
 
-    s_truth, s_pos = is_dp_s_with_spec_and_tr_verb(knowledge, elements)
-    p_truth, p_pos = is_dp_p_with_spec_and_tr_verb(knowledge, elements)
+    s_truth, s_pos = is_determiner_phrase_singular_with_spec_and_tr_verb(knowledge, elements)
+    p_truth, p_pos = is_determiner_phrase_plural_with_spec_and_tr_verb(knowledge, elements)
     if s_truth:
         return True, s_pos
     elif p_truth:
@@ -343,24 +343,24 @@ def is_dp_with_spec_and_tr_verb(knowledge, elements):
     return False, []
 
 
-def is_dp_s_with_spec_and_int_verb(knowledge, elements):
+def is_determiner_phrase_singular_with_spec_and_int_verb(knowledge, elements):
     """
     Determine if given set of words is a Singular Determiner Phrase
     with a Specifier and 3rd Person Intransitive Verb
     e.g. "the cat that quickly sleeps"
     """
 
-    return is_branches(knowledge, elements, is_dp_s, is_specifier_with_int_verb_3)
+    return is_branches(knowledge, elements, is_determiner_phrase_singular, is_specifier_with_int_verb_3)
 
 
-def is_dp_p_with_spec_and_int_verb(knowledge, elements):
+def is_determiner_phrase_plural_with_spec_and_int_verb(knowledge, elements):
     """
     Determine if given set of words is a Plural Determiner Phrase
     with a Specifier and 1st Person Intransitive Verb
     e.g. "the cats that quickly sleep"
     """
 
-    return is_branches(knowledge, elements, is_dp_p, is_specifier_with_int_verb_1)
+    return is_branches(knowledge, elements, is_determiner_phrase_plural, is_specifier_with_int_verb_1)
 
 
 def is_dp_with_spec_and_int_verb(knowledge, elements):
@@ -370,8 +370,8 @@ def is_dp_with_spec_and_int_verb(knowledge, elements):
     Singular or Plural
     """
 
-    s_truth, s_pos = is_dp_s_with_spec_and_int_verb(knowledge, elements)
-    p_truth, p_pos = is_dp_p_with_spec_and_int_verb(knowledge, elements)
+    s_truth, s_pos = is_determiner_phrase_singular_with_spec_and_int_verb(knowledge, elements)
+    p_truth, p_pos = is_determiner_phrase_plural_with_spec_and_int_verb(knowledge, elements)
     if s_truth:
         return True, s_pos
     elif p_truth:
@@ -424,15 +424,15 @@ def is_specifier_phrase_s(knowledge, elements):
     if len(elements) < 3:
         return False, []
     # Any single Intransitive Phrase will work
-    int_truth, int_pos = is_dp_s_with_spec_and_int_verb(knowledge, elements)
+    int_truth, int_pos = is_determiner_phrase_singular_with_spec_and_int_verb(knowledge, elements)
     if int_truth:
         return True, int_pos
     tr_truth, tr_pos = is_branches(knowledge, elements,
-                                   is_dp_s_with_spec_and_tr_verb, is_spec_ender)
+                                   is_determiner_phrase_singular_with_spec_and_tr_verb, is_spec_ender)
     if tr_truth:
         return True, tr_pos
     nested_truth, nested_pos = is_branches(knowledge, elements,
-                                           is_dp_s_with_spec_and_tr_verb, is_specifier_phrase)
+                                           is_determiner_phrase_singular_with_spec_and_tr_verb, is_specifier_phrase)
     if nested_truth:
         return True, nested_pos
     return False, []
@@ -447,15 +447,15 @@ def is_specifier_phrase_p(knowledge, elements):
     if len(elements) < 3:
         return False, []
     # Any single Intransitive Phrase will work
-    int_truth, int_pos = is_dp_p_with_spec_and_int_verb(knowledge, elements)
+    int_truth, int_pos = is_determiner_phrase_plural_with_spec_and_int_verb(knowledge, elements)
     if int_truth:
         return True, int_pos
     tr_truth, tr_pos = is_branches(knowledge, elements,
-                                   is_dp_p_with_spec_and_tr_verb, is_spec_ender)
+                                   is_determiner_phrase_plural_with_spec_and_tr_verb, is_spec_ender)
     if tr_truth:
         return True, tr_pos
     nested_truth, nested_pos = is_branches(knowledge, elements,
-                                           is_dp_p_with_spec_and_tr_verb, is_specifier_phrase)
+                                           is_determiner_phrase_plural_with_spec_and_tr_verb, is_specifier_phrase)
     if nested_truth:
         return True, nested_pos
     return False, []
@@ -528,7 +528,7 @@ def is_subject_s(knowledge, elements):
     DP | Specifier Phrase | Specifier Phrase + ADVP
     """
 
-    dp_truth, dp_pos = is_dp_s(knowledge, elements)
+    dp_truth, dp_pos = is_determiner_phrase_singular(knowledge, elements)
     spec_truth, spec_pos = is_specifier_s_with_advp(knowledge, elements)
     if dp_truth:
         return True, dp_pos
@@ -543,7 +543,7 @@ def is_subject_p(knowledge, elements):
     DP | Specifier Phrase | Specifier Phrase + ADVP
     """
 
-    dp_truth, dp_pos = is_dp_p(knowledge, elements)
+    dp_truth, dp_pos = is_determiner_phrase_plural(knowledge, elements)
     spec_truth, spec_pos = is_specifier_p_with_advp(knowledge, elements)
     if dp_truth:
         return True, dp_pos
@@ -781,7 +781,6 @@ def main():
     keep_going = 'y'
     while keep_going == 'y':
         user_sent = input('Enter wh-question >> ').split()
-        # print('NP > ', is_np_s(knowledge, user_sent))
         # print('INT_VP_1 > ', is_int_vp_1(knowledge, user_sent))
         # print('INT_VP_3 > ', is_int_vp_3(knowledge, user_sent))
         # print('TR_VP_3 > ', is_tr_vp_3(knowledge, user_sent))
@@ -789,7 +788,6 @@ def main():
         # print('ADVP_with_TR_V_3', is_advp_with_tr_v_3(knowledge, user_sent))
         # print('ADVP > ', is_advp(knowledge, user_sent))
         # print('VP_3 + ADVP > ', is_simple_vp_3_with_advp(knowledge, user_sent))
-        # print('DP > ', is_dp_s(knowledge, user_sent))
         # print('SPEC_with_TR_V_1 > ', is_specifier_with_tr_verb_1(knowledge, user_sent))
         # print('SPEC_with_TR_V_3 > ', is_specifier_with_tr_verb_3(knowledge, user_sent))
         # print('SPEC_with_INT_V_1 > ', is_specifier_with_int_verb_1(knowledge, user_sent))
@@ -797,8 +795,6 @@ def main():
         # print('SPEC Singuler > ', is_specifier_phrase_s(knowledge, user_sent))
         # print('Specifier Phrase > ', is_specifier_phrase(knowledge, user_sent))
         # print('Specifier + ADVP > ', is_specifier_with_advp(knowledge, user_sent))
-        # print('DP_S_with_SPEC', is_dp_s_with_spec_and_tr_verb(knowledge, user_sent))
-        # print('DP_P_with_SPEC', is_dp_p_with_spec_and_tr_verb(knowledge, user_sent))
         # print('DP_with_SPEC_and_TR_VERB', is_dp_with_spec_and_tr_verb(knowledge, user_sent))
         # print('TR_VP_3 + Specifier > ', is_tr_vp_3_with_specifier(knowledge, user_sent))
         # print('Subject > ', is_subject(knowledge, user_sent))

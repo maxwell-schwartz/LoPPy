@@ -1,7 +1,7 @@
 import pytest
 
 import loppy as lp
-from pos.determiner_phrases import is_dp_s, is_dp_p
+from pos.determiner_phrases import is_determiner_phrase_singular, is_determiner_phrase_plural
 
 knowledge = lp.FactTracker()
 knowledge.update_knowledge(lp.Fact("DET", "the"))
@@ -16,8 +16,8 @@ knowledge.update_knowledge(lp.Fact("ADJ", "blue"))
     (["the", "small", "dog"], (True, ["DET", "ADJ", "NOUN_S"])),
     (["the", "small", "blue", "dog"], (True, ["DET", "ADJ", "ADJ", "NOUN_S"])),
 ])
-def test_is_dp_s(elements, expected):
-    result = is_dp_s(knowledge, elements)
+def test_is_determiner_phrase_singular(elements, expected):
+    result = is_determiner_phrase_singular(knowledge, elements)
 
     assert result == expected
 
@@ -27,7 +27,7 @@ def test_is_dp_s(elements, expected):
     (["the", "small", "dogs"], (True, ["DET", "ADJ", "NOUN_P"])),
     (["the", "small", "blue", "dogs"], (True, ["DET", "ADJ", "ADJ", "NOUN_P"])),
 ])
-def test_is_dp_p(elements, expected):
-    result = is_dp_p(knowledge, elements)
+def test_is_determiner_phrase_plural(elements, expected):
+    result = is_determiner_phrase_plural(knowledge, elements)
 
     assert result == expected

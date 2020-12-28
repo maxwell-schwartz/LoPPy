@@ -1,7 +1,7 @@
 import pytest
 
 import loppy as lp
-from pos.noun_phrases import is_np_s, is_np_p
+from pos.noun_phrases import is_noun_phrase_singlular, is_noun_phrase_plural
 
 knowledge = lp.FactTracker()
 knowledge.update_knowledge(lp.Fact("NOUN_S", "dog"))
@@ -15,8 +15,8 @@ knowledge.update_knowledge(lp.Fact("ADJ", "blue"))
     (["small", "dog"], (True, ["ADJ", "NOUN_S"])),
     (["small", "blue", "dog"], (True, ["ADJ", "ADJ", "NOUN_S"])),
 ])
-def test_is_np_s(elements, expected):
-    result = is_np_s(knowledge, elements)
+def test_is_noun_phrase_singlular(elements, expected):
+    result = is_noun_phrase_singlular(knowledge, elements)
 
     assert result == expected
 
@@ -26,7 +26,7 @@ def test_is_np_s(elements, expected):
     (["small", "dogs"], (True, ["ADJ", "NOUN_P"])),
     (["small", "blue", "dogs"], (True, ["ADJ", "ADJ", "NOUN_P"])),
 ])
-def test_is_np_p(elements, expected):
-    result = is_np_p(knowledge, elements)
+def test_is_noun_phrase_plural(elements, expected):
+    result = is_noun_phrase_plural(knowledge, elements)
 
     assert result == expected

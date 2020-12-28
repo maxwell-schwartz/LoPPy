@@ -1,7 +1,7 @@
-from pos.noun_phrases import is_np_s, is_np_p
+from pos.noun_phrases import is_noun_phrase_singlular, is_noun_phrase_plural
 
 
-def is_dp_s(knowledge, elements):
+def is_determiner_phrase_singular(knowledge, elements):
     """
     Determine if a given set of words in a Singular Determiner Phrase
     e.g. "the small blue dog"
@@ -11,13 +11,13 @@ def is_dp_s(knowledge, elements):
         return False, []
     head, *tail = elements
     if knowledge.is_a([head], 'DET'):
-        truth, pos_list = is_np_s(knowledge, tail)
+        truth, pos_list = is_noun_phrase_singlular(knowledge, tail)
         if truth:
             return True, ['DET'] + pos_list
     return False, []
 
 
-def is_dp_p(knowledge, elements):
+def is_determiner_phrase_plural(knowledge, elements):
     """
     Determine if a given set of words in a Singular Determiner Phrase
     e.g. "the small blue dogs"
@@ -27,7 +27,7 @@ def is_dp_p(knowledge, elements):
         return False, []
     head, *tail = elements
     if knowledge.is_a([head], 'DET'):
-        truth, pos_list = is_np_p(knowledge, tail)
+        truth, pos_list = is_noun_phrase_plural(knowledge, tail)
         if truth:
             return True, ['DET'] + pos_list
     return False, []
@@ -39,8 +39,8 @@ def is_dp(knowledge, elements):
     Singular or Plural
     """
 
-    s_truth, s_pos = is_dp_s(knowledge, elements)
-    p_truth, p_pos = is_dp_p(knowledge, elements)
+    s_truth, s_pos = is_determiner_phrase_singular(knowledge, elements)
+    p_truth, p_pos = is_determiner_phrase_plural(knowledge, elements)
     if s_truth:
         return True, s_pos
     elif p_truth:
