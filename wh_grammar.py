@@ -2,54 +2,10 @@ import loppy as lp
 from pos.adverbs import is_adverbs
 from pos.auxiliary import is_aux_singular, is_aux_plural
 from pos.determiner_phrases import is_determiner_phrase_singular, is_determiner_phrase_plural, is_dp
+from pos.int_verb_phrases import is_int_verb_phrase_1, is_int_verb_phrase_3
 
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_int_vp_1(knowledge, elements):
-    """
-    Determine if a given set of words is a 1st Person (or 2nd or Plural-3rd)
-    Intransitive Verb Phrase
-    e.g. "often sleep"
-    """
-
-    if len(elements) == 0:
-        return False, []
-    elif len(elements) == 1:
-        # A lone verb works
-        if knowledge.is_a(elements, 'INT_VERB_1'):
-            return True, ['INT_VERB_1']
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'ADV'):
-        # Any number of adverbs can precede the verb
-        truth, pos_list = is_int_vp_1(knowledge, tail)
-        if truth:
-            return True, ['ADV'] + pos_list
-    return False, []
-
-
-def is_int_vp_3(knowledge, elements):
-    """
-    Determine if a given set of words is a 3rd Person Intransitive Verb Phrase
-    e.g. "often sleeps"
-    """
-
-    if len(elements) == 0:
-        return False, []
-    elif len(elements) == 1:
-        # A lone verb works
-        if knowledge.is_a(elements, 'INT_VERB_3'):
-            return True, ['INT_VERB_3']
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'ADV'):
-        # Any number of adverbs can precede the verb
-        truth, pos_list = is_int_vp_3(knowledge, tail)
-        if truth:
-            return True, ['ADV'] + pos_list
-    return False, []
 
 
 def is_adverbs_with_tr_v_1(knowledge, elements):
@@ -142,7 +98,7 @@ def is_simple_vp_1(knowledge, elements):
     """Determine if given set of words is any type of 1st-Person Verb Phrase"""
 
     tr_truth, tr_pos = is_tr_vp_1(knowledge, elements)
-    int_truth, int_pos = is_int_vp_1(knowledge, elements)
+    int_truth, int_pos = is_int_verb_phrase_1(knowledge, elements)
     if tr_truth:
         return True, tr_pos
     elif int_truth:
@@ -154,7 +110,7 @@ def is_simple_vp_3(knowledge, elements):
     """Determine if given set of words is any type of 3rd-Person Verb Phrase"""
 
     tr_truth, tr_pos = is_tr_vp_3(knowledge, elements)
-    int_truth, int_pos = is_int_vp_3(knowledge, elements)
+    int_truth, int_pos = is_int_verb_phrase_3(knowledge, elements)
     if tr_truth:
         return True, tr_pos
     elif int_truth:
@@ -252,7 +208,7 @@ def is_specifier_with_int_verb_1(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'SPEC'):
         # Check if words following specifier are a transitive verb phrase
-        int_truth, int_pos_list = is_int_vp_1(knowledge, tail)
+        int_truth, int_pos_list = is_int_verb_phrase_1(knowledge, tail)
         if int_truth:
             return True, ['SPEC'] + int_pos_list
     return False, []
@@ -270,7 +226,7 @@ def is_specifier_with_int_verb_3(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'SPEC'):
         # Check if words following specifier are a transitive verb phrase
-        int_truth, int_pos_list = is_int_vp_3(knowledge, tail)
+        int_truth, int_pos_list = is_int_verb_phrase_3(knowledge, tail)
         if int_truth:
             return True, ['SPEC'] + int_pos_list
     return False, []
@@ -559,7 +515,7 @@ def is_int_aux_phrase_s(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_singular, is_subject_s, is_int_vp_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_singular, is_subject_s, is_int_verb_phrase_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -574,7 +530,7 @@ def is_int_aux_phrase_p(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_plural, is_subject_p, is_int_vp_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_plural, is_subject_p, is_int_verb_phrase_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -750,8 +706,6 @@ def main():
     keep_going = 'y'
     while keep_going == 'y':
         user_sent = input('Enter wh-question >> ').split()
-        # print('INT_VP_1 > ', is_int_vp_1(knowledge, user_sent))
-        # print('INT_VP_3 > ', is_int_vp_3(knowledge, user_sent))
         # print('TR_VP_3 > ', is_tr_vp_3(knowledge, user_sent))
         # print('VP_3 + ADVP > ', is_simple_vp_3_with_advp(knowledge, user_sent))
         # print('SPEC_with_TR_V_1 > ', is_specifier_with_tr_verb_1(knowledge, user_sent))
