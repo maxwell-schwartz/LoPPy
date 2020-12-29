@@ -1,103 +1,26 @@
 import loppy as lp
 from pos.adverbs import is_adverbs
 from pos.auxiliary import is_aux_singular, is_aux_plural
-from pos.determiner_phrases import is_determiner_phrase_singular, is_determiner_phrase_plural, is_dp
+from pos.determiner_phrases import (
+    is_determiner_phrase_singular,
+    is_determiner_phrase_plural,
+    is_determiner_phrase,
+)
 from pos.int_verb_phrases import is_int_verb_phrase_1, is_int_verb_phrase_3
-
+from pos.tr_verb_phrases import (
+    is_adverbs_with_tr_verb_1,
+    is_adverbs_with_tr_verb_3,
+    is_tr_verb_phrase_1,
+    is_tr_verb_phrase_3,
+)
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_adverbs_with_tr_v_1(knowledge, elements):
-    """
-    Determine if given set of words is an adverb phrase followed by a 1st
-    Person Transitive Verb
-    e.g. "often throw"
-    """
-
-    if len(elements) == 0:
-        return False, []
-    elif len(elements) == 1:
-        # A lone transitive verb work
-        if knowledge.is_a(elements, 'TR_VERB_1'):
-            return True, ['TR_VERB_1']
-        return False, []
-    *head, tail = elements
-    adv_truth, adv_pos = is_adverbs(knowledge, head)
-    if adv_truth and knowledge.is_a([tail], 'TR_VERB_1'):
-        return True, adv_pos + ['TR_VERB_1']
-    return False, []
-
-
-def is_adverbs_with_tr_v_3(knowledge, elements):
-    """
-    Determine if given set of words is an adverb phrase followed by a 3rd
-    Person Transitive Verb
-    e.g. "often throws"
-    """
-
-    if len(elements) == 0:
-        return False, []
-    elif len(elements) == 1:
-        # A lone transitive verb work
-        if knowledge.is_a(elements, 'TR_VERB_3'):
-            return True, ['TR_VERB_3']
-        return False, []
-    *head, tail = elements
-    adv_truth, adv_pos = is_adverbs(knowledge, head)
-    if adv_truth and knowledge.is_a([tail], 'TR_VERB_3'):
-        return True, adv_pos + ['TR_VERB_3']
-    return False, []
-
-
-def is_tr_vp_1(knowledge, elements):
-    """
-    Determine if given set of words is a 1st Person Transitive Verb Phrase
-    Can have any number of preceding adverbs
-    e.g. "throw the food"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'TR_VERB_1'):
-        # Check if words following the transitive verb are a DP
-        dp_truth, dp_pos_list = is_determiner_phrase_plural(knowledge, tail)
-        if dp_truth:
-            return True, ['TR_VERB_1'] + dp_pos_list
-    elif knowledge.is_a([head], 'ADV'):
-        # Any number of adverbs can precede the verb
-        truth, pos_list = is_tr_vp_1(knowledge, tail)
-        return truth, ['ADV'] + pos_list
-    return False, []
-
-
-def is_tr_vp_3(knowledge, elements):
-    """
-    Determine if given set of words is a 3rd Person Transitive Verb Phrase
-    Can have any number of preceding adverbs
-    e.g. "throws the food"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'TR_VERB_3'):
-        # Check if words following the transitive verb are a DP
-        dp_truth, dp_pos_list = is_determiner_phrase_singular(knowledge, tail)
-        if dp_truth:
-            return True, ['TR_VERB_3'] + dp_pos_list
-    elif knowledge.is_a([head], 'ADV'):
-        # Any number of adverbs can precede the verb
-        truth, pos_list = is_tr_vp_3(knowledge, tail)
-        return truth, ['ADV'] + pos_list
-    return False, []
 
 
 def is_simple_vp_1(knowledge, elements):
     """Determine if given set of words is any type of 1st-Person Verb Phrase"""
 
-    tr_truth, tr_pos = is_tr_vp_1(knowledge, elements)
+    tr_truth, tr_pos = is_tr_verb_phrase_1(knowledge, elements)
     int_truth, int_pos = is_int_verb_phrase_1(knowledge, elements)
     if tr_truth:
         return True, tr_pos
@@ -109,7 +32,7 @@ def is_simple_vp_1(knowledge, elements):
 def is_simple_vp_3(knowledge, elements):
     """Determine if given set of words is any type of 3rd-Person Verb Phrase"""
 
-    tr_truth, tr_pos = is_tr_vp_3(knowledge, elements)
+    tr_truth, tr_pos = is_tr_verb_phrase_3(knowledge, elements)
     int_truth, int_pos = is_int_verb_phrase_3(knowledge, elements)
     if tr_truth:
         return True, tr_pos
@@ -172,7 +95,7 @@ def is_specifier_with_tr_verb_1(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'SPEC'):
         # Check if words following specifier are a transitive verb phrase
-        tr_truth, tr_pos_list = is_adverbs_with_tr_v_1(knowledge, tail)
+        tr_truth, tr_pos_list = is_adverbs_with_tr_verb_1(knowledge, tail)
         if tr_truth:
             return True, ['SPEC'] + tr_pos_list
     return False, []
@@ -190,7 +113,7 @@ def is_specifier_with_tr_verb_3(knowledge, elements):
     head, *tail = elements
     if knowledge.is_a([head], 'SPEC'):
         # Check if words following specifier are an transitive verb phrase
-        tr_truth, tr_pos_list = is_adverbs_with_tr_v_3(knowledge, tail)
+        tr_truth, tr_pos_list = is_adverbs_with_tr_verb_3(knowledge, tail)
         if tr_truth:
             return True, ['SPEC'] + tr_pos_list
     return False, []
@@ -310,7 +233,7 @@ def is_spec_ender(knowledge, elements):
     This can be any Determiner Phrase or DP with a Spec and Intransitive Verb
     """
 
-    dp_truth, dp_pos = is_dp(knowledge, elements)
+    dp_truth, dp_pos = is_determiner_phrase(knowledge, elements)
     spec_truth, spec_pos = is_dp_with_spec_and_int_verb(knowledge, elements)
     if dp_truth:
         return True, dp_pos
@@ -431,7 +354,7 @@ def is_specifier_with_advp(knowledge, elements):
     return is_branches(knowledge, elements, is_specifier_phrase, is_adverbs)
 
 
-def is_tr_vp_3_with_specifier(knowledge, elements):
+def is_tr_verb_phrase_3_with_specifier(knowledge, elements):
     """
     Determine if given set of words is a transitive VP with an optional Specifier
     e.g. "eats the bird that eats the food"
@@ -483,7 +406,7 @@ def is_subject(knowledge, elements):
     DP | Specifier Phrase | Specifier Phrase + ADVP
     """
 
-    dp_truth, dp_pos = is_dp(knowledge, elements)
+    dp_truth, dp_pos = is_determiner_phrase(knowledge, elements)
     spec_truth, spec_pos = is_specifier_with_advp(knowledge, elements)
     if dp_truth:
         return True, dp_pos
@@ -498,7 +421,7 @@ def is_predicate(knowledge, elements):
     VP | VP + ADVP | Tr_VP + Specifier | Tr_VP + Specifier + ADVP
     """
     vp_truth, vp_pos = is_simple_vp_3_with_advp(knowledge, elements)
-    tr_sp_truth, tr_sp_pos = is_tr_vp_3_with_specifier(knowledge, elements)
+    tr_sp_truth, tr_sp_pos = is_tr_verb_phrase_3_with_specifier(knowledge, elements)
     if vp_truth:
         return True, vp_pos
     elif tr_sp_truth:
@@ -560,7 +483,7 @@ def is_tr_aux_phrase_s(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_singular, is_subject_s, is_adverbs_with_tr_v_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_singular, is_subject_s, is_adverbs_with_tr_verb_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -575,7 +498,7 @@ def is_tr_aux_phrase_p(knowledge, elements):
     if len(elements) < 3:
         return False, []
 
-    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_plural, is_subject_p, is_adverbs_with_tr_v_1)
+    aux_truth, aux_pos = is_wrapped(knowledge, elements, is_aux_plural, is_subject_p, is_adverbs_with_tr_verb_1)
     if aux_truth:
         return True, aux_pos
     return False, []
@@ -706,7 +629,6 @@ def main():
     keep_going = 'y'
     while keep_going == 'y':
         user_sent = input('Enter wh-question >> ').split()
-        # print('TR_VP_3 > ', is_tr_vp_3(knowledge, user_sent))
         # print('VP_3 + ADVP > ', is_simple_vp_3_with_advp(knowledge, user_sent))
         # print('SPEC_with_TR_V_1 > ', is_specifier_with_tr_verb_1(knowledge, user_sent))
         # print('SPEC_with_TR_V_3 > ', is_specifier_with_tr_verb_3(knowledge, user_sent))
@@ -716,7 +638,6 @@ def main():
         # print('Specifier Phrase > ', is_specifier_phrase(knowledge, user_sent))
         # print('Specifier + ADVP > ', is_specifier_with_advp(knowledge, user_sent))
         # print('DP_with_SPEC_and_TR_VERB', is_dp_with_spec_and_tr_verb(knowledge, user_sent))
-        # print('TR_VP_3 + Specifier > ', is_tr_vp_3_with_specifier(knowledge, user_sent))
         # print('Subject > ', is_subject(knowledge, user_sent))
         # print('Subject Singular > ', is_subject_s(knowledge, user_sent))
         # print('Predicate > ', is_predicate(knowledge, user_sent))

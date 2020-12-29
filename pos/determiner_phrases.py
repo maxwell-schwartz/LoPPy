@@ -19,7 +19,7 @@ def is_determiner_phrase_singular(knowledge, elements):
 
 def is_determiner_phrase_plural(knowledge, elements):
     """
-    Determine if a given set of words in a Singular Determiner Phrase
+    Determine if a given set of words is a Plural Determiner Phrase
     e.g. "the small blue dogs"
     """
 
@@ -33,7 +33,7 @@ def is_determiner_phrase_plural(knowledge, elements):
     return False, []
 
 
-def is_dp(knowledge, elements):
+def is_determiner_phrase(knowledge, elements):
     """
     Determine if given set of words is any type of Determiner Phrase
     Singular or Plural
