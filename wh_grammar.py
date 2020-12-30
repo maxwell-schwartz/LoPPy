@@ -6,86 +6,17 @@ from pos.determiner_phrases import (
     is_determiner_phrase_plural,
     is_determiner_phrase,
 )
-from pos.int_verb_phrases import is_int_verb_phrase_1, is_int_verb_phrase_3
+from pos.int_verb_phrases import is_int_verb_phrase_1
 from pos.simple_verb_phrases import is_simple_verb_phrase_3_with_adverbs
-from pos.tr_verb_phrases import (
-    is_adverbs_with_tr_verb_1,
-    is_adverbs_with_tr_verb_3,
+from pos.specifiers import (
+    is_specifier_with_int_verb_3,
+    is_specifier_with_int_verb_1,
+    is_specifier_with_tr_verb_3,
+    is_specifier_with_tr_verb_1,
 )
+from pos.tr_verb_phrases import is_adverbs_with_tr_verb_1
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_specifier_with_tr_verb_1(knowledge, elements):
-    """
-    Determine if given set of words is a specifier followed by a
-    First Person Transitive Verb
-    e.g. "that quickly throw"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'SPEC'):
-        # Check if words following specifier are a transitive verb phrase
-        tr_truth, tr_pos_list = is_adverbs_with_tr_verb_1(knowledge, tail)
-        if tr_truth:
-            return True, ['SPEC'] + tr_pos_list
-    return False, []
-
-
-def is_specifier_with_tr_verb_3(knowledge, elements):
-    """
-    Determine if given set of words is a specifier followed by a
-    3rd Person Transitive Verb
-    e.g. "that quickly throws"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'SPEC'):
-        # Check if words following specifier are an transitive verb phrase
-        tr_truth, tr_pos_list = is_adverbs_with_tr_verb_3(knowledge, tail)
-        if tr_truth:
-            return True, ['SPEC'] + tr_pos_list
-    return False, []
-
-
-def is_specifier_with_int_verb_1(knowledge, elements):
-    """
-    Determine if given set of words is a Specifier followed by an
-    Intransitive 1st Person Verb Phrase
-    e.g. "that sleep"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'SPEC'):
-        # Check if words following specifier are a transitive verb phrase
-        int_truth, int_pos_list = is_int_verb_phrase_1(knowledge, tail)
-        if int_truth:
-            return True, ['SPEC'] + int_pos_list
-    return False, []
-
-
-def is_specifier_with_int_verb_3(knowledge, elements):
-    """
-    Determine if given set of words is a Specifier followed by an
-    Intransitive 3rd Person Verb Phrase
-    e.g. "that sleeps"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], 'SPEC'):
-        # Check if words following specifier are a transitive verb phrase
-        int_truth, int_pos_list = is_int_verb_phrase_3(knowledge, tail)
-        if int_truth:
-            return True, ['SPEC'] + int_pos_list
-    return False, []
 
 
 def is_determiner_phrase_singular_with_spec_and_tr_verb(knowledge, elements):
@@ -562,21 +493,6 @@ def main():
     keep_going = 'y'
     while keep_going == 'y':
         user_sent = input('Enter wh-question >> ').split()
-        # print('SPEC_with_TR_V_1 > ', is_specifier_with_tr_verb_1(knowledge, user_sent))
-        # print('SPEC_with_TR_V_3 > ', is_specifier_with_tr_verb_3(knowledge, user_sent))
-        # print('SPEC_with_INT_V_1 > ', is_specifier_with_int_verb_1(knowledge, user_sent))
-        # print('SPEC_with_INT_V_3 > ', is_specifier_with_int_verb_3(knowledge, user_sent))
-        # print('SPEC Singuler > ', is_specifier_phrase_s(knowledge, user_sent))
-        # print('Specifier Phrase > ', is_specifier_phrase(knowledge, user_sent))
-        # print('Specifier + ADVP > ', is_specifier_with_advp(knowledge, user_sent))
-        # print('DP_with_SPEC_and_TR_VERB', is_dp_with_spec_and_tr_verb(knowledge, user_sent))
-        # print('Subject > ', is_subject(knowledge, user_sent))
-        # print('Subject Singular > ', is_subject_s(knowledge, user_sent))
-        # print('Predicate > ', is_predicate(knowledge, user_sent))
-        # print('Int Aux Phrase S > ', is_int_aux_phrase_s(knowledge, user_sent))
-        # print('Trans Aux Phrase S > ', is_tr_aux_phrase_s(knowledge, user_sent))
-        # print('AUX > ', is_aux_phrase(knowledge, user_sent))
-        # print('Wh question > ', is_wh_question(knowledge, user_sent))
         print('Wh question >', is_wh_question_with_adv(knowledge, user_sent))
         keep_going = input('Continue? (y/n) ')
 
