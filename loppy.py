@@ -46,9 +46,8 @@ class FactTracker(object):
     def solve_one(self, fact):
         """Provide all possible values for variables in a single fact"""
         # List indices of elements that are variables and those that aren't
-        knowns = [i for i, e in enumerate(fact.elements) if e[0] != '?' 
-                    and e != '_']
-        unknowns = [i for i, e in enumerate(fact.elements) if e[0] == '?']
+        knowns = [i for i, e in enumerate(fact.elements) if e[0] != "?" and e != "_"]
+        unknowns = [i for i, e in enumerate(fact.elements) if e[0] == "?"]
 
         # Loop through all facts of this name
         # If all known elements match, that fact is a viable option
@@ -63,7 +62,7 @@ class FactTracker(object):
             # If choice is viable at the end, provide all solutions to unknowns
             if viable:
                 solution = [(fact.elements[u], choice[u]) for u in unknowns]
-                yield '{} = {}'.format(solution[0][0], solution[0][1])
+                yield "{} = {}".format(solution[0][0], solution[0][1])
 
     def solve_full(self, *args):
         """Yield only solutions that satisfy all searched facts"""

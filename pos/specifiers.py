@@ -12,11 +12,11 @@ def is_specifier_with_tr_verb_1(knowledge, elements):
     if len(elements) < 2:
         return False, []
     head, *tail = elements
-    if knowledge.is_a([head], 'SPEC'):
+    if knowledge.is_a([head], "SPEC"):
         # Check if words following specifier are a transitive verb phrase
         tr_truth, tr_pos_list = is_adverbs_with_tr_verb_1(knowledge, tail)
         if tr_truth:
-            return True, ['SPEC'] + tr_pos_list
+            return True, ["SPEC"] + tr_pos_list
     return False, []
 
 
@@ -30,11 +30,11 @@ def is_specifier_with_tr_verb_3(knowledge, elements):
     if len(elements) < 2:
         return False, []
     head, *tail = elements
-    if knowledge.is_a([head], 'SPEC'):
+    if knowledge.is_a([head], "SPEC"):
         # Check if words following specifier are an transitive verb phrase
         tr_truth, tr_pos_list = is_adverbs_with_tr_verb_3(knowledge, tail)
         if tr_truth:
-            return True, ['SPEC'] + tr_pos_list
+            return True, ["SPEC"] + tr_pos_list
     return False, []
 
 
@@ -48,11 +48,11 @@ def is_specifier_with_int_verb_1(knowledge, elements):
     if len(elements) < 2:
         return False, []
     head, *tail = elements
-    if knowledge.is_a([head], 'SPEC'):
+    if knowledge.is_a([head], "SPEC"):
         # Check if words following specifier are a transitive verb phrase
         int_truth, int_pos_list = is_int_verb_phrase_1(knowledge, tail)
         if int_truth:
-            return True, ['SPEC'] + int_pos_list
+            return True, ["SPEC"] + int_pos_list
     return False, []
 
 
@@ -66,9 +66,9 @@ def is_specifier_with_int_verb_3(knowledge, elements):
     if len(elements) < 2:
         return False, []
     head, *tail = elements
-    if knowledge.is_a([head], 'SPEC'):
+    if knowledge.is_a([head], "SPEC"):
         # Check if words following specifier are a transitive verb phrase
         int_truth, int_pos_list = is_int_verb_phrase_3(knowledge, tail)
         if int_truth:
-            return True, ['SPEC'] + int_pos_list
+            return True, ["SPEC"] + int_pos_list
     return False, []

@@ -20,12 +20,21 @@ knowledge.update_knowledge(lp.Fact("NOUN_P", "foods"))
 knowledge.update_knowledge(lp.Fact("ADV", "often"))
 
 
-@pytest.mark.parametrize("elements,expected", [
-    (["often", "throw", "the", "food"], (True, ["ADV", "TR_VERB_1", "DET", "NOUN_S"])),
-    (["often", "throw", "the", "foods"], (True, ["ADV", "TR_VERB_1", "DET", "NOUN_P"])),
-    (["often", "sleep"], (True, ["ADV", "INT_VERB_1"])),
-    (["often", "sleeps"], (True, ["ADV", "INT_VERB_3"])),
-])
+@pytest.mark.parametrize(
+    "elements,expected",
+    [
+        (
+            ["often", "throw", "the", "food"],
+            (True, ["ADV", "TR_VERB_1", "DET", "NOUN_S"]),
+        ),
+        (
+            ["often", "throw", "the", "foods"],
+            (True, ["ADV", "TR_VERB_1", "DET", "NOUN_P"]),
+        ),
+        (["often", "sleep"], (True, ["ADV", "INT_VERB_1"])),
+        (["often", "sleeps"], (True, ["ADV", "INT_VERB_3"])),
+    ],
+)
 def test_is_simple_verb_phrase(elements, expected):
     result = is_simple_verb_phrase(knowledge, elements)
 

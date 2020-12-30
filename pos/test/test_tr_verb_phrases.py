@@ -33,20 +33,38 @@ def test_is_adverbs_with_tr_verb_3():
     assert result == (True, ["ADV", "TR_VERB_3"])
 
 
-@pytest.mark.parametrize("elements,expected", [
-    (["often", "throw", "the", "food"], (True, ["ADV", "TR_VERB_1", "DET", "NOUN_S"])),
-    (["often", "throw", "the", "foods"], (True, ["ADV", "TR_VERB_1", "DET", "NOUN_P"])),
-])
+@pytest.mark.parametrize(
+    "elements,expected",
+    [
+        (
+            ["often", "throw", "the", "food"],
+            (True, ["ADV", "TR_VERB_1", "DET", "NOUN_S"]),
+        ),
+        (
+            ["often", "throw", "the", "foods"],
+            (True, ["ADV", "TR_VERB_1", "DET", "NOUN_P"]),
+        ),
+    ],
+)
 def test_is_tr_verb_phrase_1(elements, expected):
     result = is_tr_verb_phrase_1(knowledge, elements)
 
     assert result == expected
 
 
-@pytest.mark.parametrize("elements,expected", [
-    (["often", "throws", "the", "food"], (True, ["ADV", "TR_VERB_3", "DET", "NOUN_S"])),
-    (["often", "throws", "the", "foods"], (True, ["ADV", "TR_VERB_3", "DET", "NOUN_P"])),
-])
+@pytest.mark.parametrize(
+    "elements,expected",
+    [
+        (
+            ["often", "throws", "the", "food"],
+            (True, ["ADV", "TR_VERB_3", "DET", "NOUN_S"]),
+        ),
+        (
+            ["often", "throws", "the", "foods"],
+            (True, ["ADV", "TR_VERB_3", "DET", "NOUN_P"]),
+        ),
+    ],
+)
 def test_is_tr_verb_phrase_3(elements, expected):
     result = is_tr_verb_phrase_3(knowledge, elements)
 

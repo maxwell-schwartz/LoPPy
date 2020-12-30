@@ -10,10 +10,10 @@ def is_determiner_phrase_singular(knowledge, elements):
     if len(elements) < 2:
         return False, []
     head, *tail = elements
-    if knowledge.is_a([head], 'DET'):
+    if knowledge.is_a([head], "DET"):
         truth, pos_list = is_noun_phrase_singlular(knowledge, tail)
         if truth:
-            return True, ['DET'] + pos_list
+            return True, ["DET"] + pos_list
     return False, []
 
 
@@ -26,10 +26,10 @@ def is_determiner_phrase_plural(knowledge, elements):
     if len(elements) < 2:
         return False, []
     head, *tail = elements
-    if knowledge.is_a([head], 'DET'):
+    if knowledge.is_a([head], "DET"):
         truth, pos_list = is_noun_phrase_plural(knowledge, tail)
         if truth:
-            return True, ['DET'] + pos_list
+            return True, ["DET"] + pos_list
     return False, []
 
 

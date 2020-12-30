@@ -7,8 +7,8 @@ def is_wh_word(knowledge, elements):
 
     if len(elements) == 0:
         return False, []
-    elif len(elements) == 1 and knowledge.is_a(elements, 'WH'):
-        return True, ['WH']
+    elif len(elements) == 1 and knowledge.is_a(elements, "WH"):
+        return True, ["WH"]
     return False, []
 
 
@@ -18,6 +18,6 @@ def is_wh_subject_word(knowledge, elements):
     Specifically: "who" and "what"
     """
 
-    if len(elements) == 1 and knowledge.is_a(elements, 'WH_S'):
-        return True, ['WH_S']
+    if len(elements) == 1 and knowledge.is_a(elements, "WH_S"):
+        return True, ["WH_S"]
     return False, []

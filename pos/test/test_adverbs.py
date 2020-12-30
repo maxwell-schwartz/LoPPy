@@ -8,10 +8,13 @@ knowledge.update_knowledge(lp.Fact("ADV", "quickly"))
 knowledge.update_knowledge(lp.Fact("ADV", "often"))
 
 
-@pytest.mark.parametrize("elements,expected", [
-    (["quickly"], (True, ["ADV"])),
-    (["often", "quickly", "quickly"], (True, ["ADV", "ADV", "ADV"])),
-])
+@pytest.mark.parametrize(
+    "elements,expected",
+    [
+        (["quickly"], (True, ["ADV"])),
+        (["often", "quickly", "quickly"], (True, ["ADV", "ADV", "ADV"])),
+    ],
+)
 def test_is_adverbs(elements, expected):
     result = is_adverbs(knowledge, elements)
 

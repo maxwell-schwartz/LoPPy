@@ -6,10 +6,10 @@ def is_adverbs(knowledge, elements):
 
     if len(elements) == 0:
         return False, []
-    elif len(elements) == 1 and knowledge.is_a(elements, 'ADV'):
-        return True, ['ADV']
+    elif len(elements) == 1 and knowledge.is_a(elements, "ADV"):
+        return True, ["ADV"]
     head, *tail = elements
-    if knowledge.is_a([head], 'ADV'):
+    if knowledge.is_a([head], "ADV"):
         truth, pos_list = is_adverbs(knowledge, tail)
-        return truth, ['ADV'] + pos_list
+        return truth, ["ADV"] + pos_list
     return False, []
