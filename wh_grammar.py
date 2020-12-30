@@ -7,80 +7,13 @@ from pos.determiner_phrases import (
     is_determiner_phrase,
 )
 from pos.int_verb_phrases import is_int_verb_phrase_1, is_int_verb_phrase_3
+from pos.simple_verb_phrases import is_simple_verb_phrase_3_with_adverbs
 from pos.tr_verb_phrases import (
     is_adverbs_with_tr_verb_1,
     is_adverbs_with_tr_verb_3,
-    is_tr_verb_phrase_1,
-    is_tr_verb_phrase_3,
 )
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_simple_vp_1(knowledge, elements):
-    """Determine if given set of words is any type of 1st-Person Verb Phrase"""
-
-    tr_truth, tr_pos = is_tr_verb_phrase_1(knowledge, elements)
-    int_truth, int_pos = is_int_verb_phrase_1(knowledge, elements)
-    if tr_truth:
-        return True, tr_pos
-    elif int_truth:
-        return True, int_pos
-    return False, []
-
-
-def is_simple_vp_3(knowledge, elements):
-    """Determine if given set of words is any type of 3rd-Person Verb Phrase"""
-
-    tr_truth, tr_pos = is_tr_verb_phrase_3(knowledge, elements)
-    int_truth, int_pos = is_int_verb_phrase_3(knowledge, elements)
-    if tr_truth:
-        return True, tr_pos
-    elif int_truth:
-        return True, int_pos
-    return False, []
-
-
-def is_simple_vp(knowledge, elements):
-    """Determine if given set of words is any type of Verb Phrase"""
-
-    first_truth, first_pos = is_simple_vp_1(knowledge, elements)
-    third_truth, third_pos = is_simple_vp_3(knowledge, elements)
-    if first_truth:
-        return True, first_pos
-    elif third_truth:
-        return True, third_pos
-    return False, []
-
-
-def is_simple_vp_1_with_advp(knowledge, elements):
-    """
-    Determine if given set of words is a VP followed by any number of adverbs
-    This includes 0 adverbs
-    e.g. "eat the food often quickly"
-    """
-
-    vp_truth, vp_pos = is_simple_vp_1(knowledge, elements)
-    # If it is a standard VP, it is accepted
-    if vp_truth:
-        return True, vp_pos
-    # Check to see if it is a VP + ADVP
-    return is_branches(knowledge, elements, is_simple_vp_1, is_adverbs)
-
-
-def is_simple_vp_3_with_advp(knowledge, elements):
-    """
-    Determine if given set of words is a VP followed by any number of adverbs
-    This includes 0 adverbs
-    e.g. "eats the food often quickly"
-    """
-
-    vp_truth, vp_pos = is_simple_vp_3(knowledge, elements)
-    # If it is a standard VP, it is accepted
-    if vp_truth:
-        return True, vp_pos
-    # Check to see if it is a VP + ADVP
-    return is_branches(knowledge, elements, is_simple_vp_3, is_adverbs)
 
 
 def is_specifier_with_tr_verb_1(knowledge, elements):
@@ -420,7 +353,7 @@ def is_predicate(knowledge, elements):
     Determine if given set of words is a viable Predicate for a sentence
     VP | VP + ADVP | Tr_VP + Specifier | Tr_VP + Specifier + ADVP
     """
-    vp_truth, vp_pos = is_simple_vp_3_with_advp(knowledge, elements)
+    vp_truth, vp_pos = is_simple_verb_phrase_3_with_adverbs(knowledge, elements)
     tr_sp_truth, tr_sp_pos = is_tr_verb_phrase_3_with_specifier(knowledge, elements)
     if vp_truth:
         return True, vp_pos
@@ -629,7 +562,6 @@ def main():
     keep_going = 'y'
     while keep_going == 'y':
         user_sent = input('Enter wh-question >> ').split()
-        # print('VP_3 + ADVP > ', is_simple_vp_3_with_advp(knowledge, user_sent))
         # print('SPEC_with_TR_V_1 > ', is_specifier_with_tr_verb_1(knowledge, user_sent))
         # print('SPEC_with_TR_V_3 > ', is_specifier_with_tr_verb_3(knowledge, user_sent))
         # print('SPEC_with_INT_V_1 > ', is_specifier_with_int_verb_1(knowledge, user_sent))
