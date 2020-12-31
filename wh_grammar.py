@@ -6,105 +6,19 @@ from pos.determiner_phrases import (
     is_determiner_phrase_plural,
     is_determiner_phrase,
 )
+from pos.determiner_phrases_with_specifier import (
+    is_determiner_phrase_singular_with_spec_and_tr_verb,
+    is_determiner_phrase_plural_with_spec_and_tr_verb,
+    is_determiner_phrase_with_spec_and_tr_verb,
+    is_determiner_phrase_with_spec_and_int_verb,
+    is_determiner_phrase_singular_with_spec_and_int_verb,
+    is_determiner_phrase_plural_with_spec_and_int_verb,
+)
 from pos.int_verb_phrases import is_int_verb_phrase_1
 from pos.simple_verb_phrases import is_simple_verb_phrase_3_with_adverbs
-from pos.specifiers import (
-    is_specifier_with_int_verb_3,
-    is_specifier_with_int_verb_1,
-    is_specifier_with_tr_verb_3,
-    is_specifier_with_tr_verb_1,
-)
 from pos.tr_verb_phrases import is_adverbs_with_tr_verb_1
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_determiner_phrase_singular_with_spec_and_tr_verb(knowledge, elements):
-    """
-    Determine if given set of words is a Singular Determiner Phrase
-    with a Specifier and 3rd Person Transitive Verb
-    e.g. "the cat that quickly throws"
-    """
-
-    return is_branches(
-        knowledge, elements, is_determiner_phrase_singular, is_specifier_with_tr_verb_3
-    )
-
-
-def is_determiner_phrase_plural_with_spec_and_tr_verb(knowledge, elements):
-    """
-    Determine if given set of words is a Plural Determiner Phrase
-    with a Specifier and 1st Person Transitive Verb
-    e.g. "the cats that quickly throw"
-    """
-
-    return is_branches(
-        knowledge, elements, is_determiner_phrase_plural, is_specifier_with_tr_verb_1
-    )
-
-
-def is_dp_with_spec_and_tr_verb(knowledge, elements):
-    """
-    Determine if given set of words is any type of Determiner Phrase
-    with a Specifier and Transitive Verb
-    Singular or Plural
-    """
-
-    s_truth, s_pos = is_determiner_phrase_singular_with_spec_and_tr_verb(
-        knowledge, elements
-    )
-    p_truth, p_pos = is_determiner_phrase_plural_with_spec_and_tr_verb(
-        knowledge, elements
-    )
-    if s_truth:
-        return True, s_pos
-    elif p_truth:
-        return True, p_pos
-    return False, []
-
-
-def is_determiner_phrase_singular_with_spec_and_int_verb(knowledge, elements):
-    """
-    Determine if given set of words is a Singular Determiner Phrase
-    with a Specifier and 3rd Person Intransitive Verb
-    e.g. "the cat that quickly sleeps"
-    """
-
-    return is_branches(
-        knowledge, elements, is_determiner_phrase_singular, is_specifier_with_int_verb_3
-    )
-
-
-def is_determiner_phrase_plural_with_spec_and_int_verb(knowledge, elements):
-    """
-    Determine if given set of words is a Plural Determiner Phrase
-    with a Specifier and 1st Person Intransitive Verb
-    e.g. "the cats that quickly sleep"
-    """
-
-    return is_branches(
-        knowledge, elements, is_determiner_phrase_plural, is_specifier_with_int_verb_1
-    )
-
-
-def is_dp_with_spec_and_int_verb(knowledge, elements):
-    """
-    Determine if given set of words is a Determiner Phrase
-    with a Specifier
-    Singular or Plural
-    """
-
-    s_truth, s_pos = is_determiner_phrase_singular_with_spec_and_int_verb(
-        knowledge, elements
-    )
-    p_truth, p_pos = is_determiner_phrase_plural_with_spec_and_int_verb(
-        knowledge, elements
-    )
-    if s_truth:
-        return True, s_pos
-    elif p_truth:
-        return True, p_pos
-    return False, []
 
 
 def is_spec_ender(knowledge, elements):
@@ -114,7 +28,9 @@ def is_spec_ender(knowledge, elements):
     """
 
     dp_truth, dp_pos = is_determiner_phrase(knowledge, elements)
-    spec_truth, spec_pos = is_dp_with_spec_and_int_verb(knowledge, elements)
+    spec_truth, spec_pos = is_determiner_phrase_with_spec_and_int_verb(
+        knowledge, elements
+    )
     if dp_truth:
         return True, dp_pos
     elif spec_truth:
@@ -131,16 +47,21 @@ def is_specifier_phrase(knowledge, elements):
     if len(elements) < 3:
         return False, []
     # Any single Intransitive Phrase will work
-    int_truth, int_pos = is_dp_with_spec_and_int_verb(knowledge, elements)
+    int_truth, int_pos = is_determiner_phrase_with_spec_and_int_verb(
+        knowledge, elements
+    )
     if int_truth:
         return True, int_pos
     tr_truth, tr_pos = is_branches(
-        knowledge, elements, is_dp_with_spec_and_tr_verb, is_spec_ender
+        knowledge, elements, is_determiner_phrase_with_spec_and_tr_verb, is_spec_ender
     )
     if tr_truth:
         return True, tr_pos
     nested_truth, nested_pos = is_branches(
-        knowledge, elements, is_dp_with_spec_and_tr_verb, is_specifier_phrase
+        knowledge,
+        elements,
+        is_determiner_phrase_with_spec_and_tr_verb,
+        is_specifier_phrase,
     )
     if nested_truth:
         return True, nested_pos
