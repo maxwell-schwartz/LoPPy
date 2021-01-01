@@ -1,9 +1,9 @@
 import loppy as lp
 from pos.auxiliary import is_aux_singular, is_aux_plural
-from pos.complete_determiner_phrases import (
-    is_specifier_with_advp,
-    is_specifier_s_with_advp,
-    is_specifier_p_with_advp,
+from pos.complex_determiner_phrases import (
+    is_complex_determiner_phrase,
+    is_complex_determiner_phrase_singular,
+    is_complex_determiner_phrase_plural,
 )
 from pos.determiner_phrases import (
     is_determiner_phrase_singular,
@@ -27,7 +27,7 @@ def is_tr_verb_phrase_3_with_specifier(knowledge, elements):
         return False, []
     head, *tail = elements
     if knowledge.is_a([head], "TR_VERB_3"):
-        truth, pos_list = is_specifier_with_advp(knowledge, tail)
+        truth, pos_list = is_complex_determiner_phrase(knowledge, tail)
         if truth:
             return True, ["TR_VERB_3"] + pos_list
     return False, []
@@ -40,7 +40,7 @@ def is_subject_s(knowledge, elements):
     """
 
     dp_truth, dp_pos = is_determiner_phrase_singular(knowledge, elements)
-    spec_truth, spec_pos = is_specifier_s_with_advp(knowledge, elements)
+    spec_truth, spec_pos = is_complex_determiner_phrase_singular(knowledge, elements)
     if dp_truth:
         return True, dp_pos
     elif spec_truth:
@@ -55,7 +55,7 @@ def is_subject_p(knowledge, elements):
     """
 
     dp_truth, dp_pos = is_determiner_phrase_plural(knowledge, elements)
-    spec_truth, spec_pos = is_specifier_p_with_advp(knowledge, elements)
+    spec_truth, spec_pos = is_complex_determiner_phrase_plural(knowledge, elements)
     if dp_truth:
         return True, dp_pos
     elif spec_truth:
@@ -70,7 +70,7 @@ def is_subject(knowledge, elements):
     """
 
     dp_truth, dp_pos = is_determiner_phrase(knowledge, elements)
-    spec_truth, spec_pos = is_specifier_with_advp(knowledge, elements)
+    spec_truth, spec_pos = is_complex_determiner_phrase(knowledge, elements)
     if dp_truth:
         return True, dp_pos
     elif spec_truth:
