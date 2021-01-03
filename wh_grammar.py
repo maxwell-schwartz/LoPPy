@@ -13,24 +13,9 @@ from pos.determiner_phrases import (
 from pos.int_verb_phrases import is_int_verb_phrase_1
 from pos.simple_verb_phrases import is_simple_verb_phrase_3_with_adverbs
 from pos.tr_verb_phrases import is_adverbs_with_tr_verb_1
+from pos.tr_verb_phrases_with_specifier import is_tr_verb_phrase_3_with_specifier
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_tr_verb_phrase_3_with_specifier(knowledge, elements):
-    """
-    Determine if given set of words is a transitive VP with an optional Specifier
-    e.g. "eats the bird that eats the food"
-    """
-
-    if len(elements) < 2:
-        return False, []
-    head, *tail = elements
-    if knowledge.is_a([head], "TR_VERB_3"):
-        truth, pos_list = is_complex_determiner_phrase(knowledge, tail)
-        if truth:
-            return True, ["TR_VERB_3"] + pos_list
-    return False, []
 
 
 def is_subject_s(knowledge, elements):
