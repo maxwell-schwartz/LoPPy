@@ -1,66 +1,12 @@
 import loppy as lp
 from pos.auxiliary import is_aux_singular, is_aux_plural
-from pos.complex_determiner_phrases import (
-    is_complex_determiner_phrase,
-    is_complex_determiner_phrase_singular,
-    is_complex_determiner_phrase_plural,
-)
-from pos.determiner_phrases import (
-    is_determiner_phrase_singular,
-    is_determiner_phrase_plural,
-    is_determiner_phrase,
-)
 from pos.int_verb_phrases import is_int_verb_phrase_1
 from pos.simple_verb_phrases import is_simple_verb_phrase_3_with_adverbs
 from pos.tr_verb_phrases import is_adverbs_with_tr_verb_1
 from pos.tr_verb_phrases_with_specifier import is_tr_verb_phrase_3_with_specifier
+from sentence_pieces.subjects import is_subject_singular, is_subject_plural, is_subject
 from structure_helpers.structure_helpers import is_branches, is_wrapped
 from pos.wh import is_wh_word, is_wh_subject_word
-
-
-def is_subject_s(knowledge, elements):
-    """
-    Determine if given set of words is a viable Singular Subject for a sentence
-    DP | Specifier Phrase | Specifier Phrase + ADVP
-    """
-
-    dp_truth, dp_pos = is_determiner_phrase_singular(knowledge, elements)
-    spec_truth, spec_pos = is_complex_determiner_phrase_singular(knowledge, elements)
-    if dp_truth:
-        return True, dp_pos
-    elif spec_truth:
-        return True, spec_pos
-    return False, []
-
-
-def is_subject_p(knowledge, elements):
-    """
-    Determine if given set of words is a viable Plural Subject for a sentence
-    DP | Specifier Phrase | Specifier Phrase + ADVP
-    """
-
-    dp_truth, dp_pos = is_determiner_phrase_plural(knowledge, elements)
-    spec_truth, spec_pos = is_complex_determiner_phrase_plural(knowledge, elements)
-    if dp_truth:
-        return True, dp_pos
-    elif spec_truth:
-        return True, spec_pos
-    return False, []
-
-
-def is_subject(knowledge, elements):
-    """
-    Determine if given set of words is a viable Subject for a sentence
-    DP | Specifier Phrase | Specifier Phrase + ADVP
-    """
-
-    dp_truth, dp_pos = is_determiner_phrase(knowledge, elements)
-    spec_truth, spec_pos = is_complex_determiner_phrase(knowledge, elements)
-    if dp_truth:
-        return True, dp_pos
-    elif spec_truth:
-        return True, spec_pos
-    return False, []
 
 
 def is_predicate(knowledge, elements):
@@ -87,7 +33,7 @@ def is_int_aux_phrase_s(knowledge, elements):
         return False, []
 
     aux_truth, aux_pos = is_wrapped(
-        knowledge, elements, is_aux_singular, is_subject_s, is_int_verb_phrase_1
+        knowledge, elements, is_aux_singular, is_subject_singular, is_int_verb_phrase_1
     )
     if aux_truth:
         return True, aux_pos
@@ -104,7 +50,7 @@ def is_int_aux_phrase_p(knowledge, elements):
         return False, []
 
     aux_truth, aux_pos = is_wrapped(
-        knowledge, elements, is_aux_plural, is_subject_p, is_int_verb_phrase_1
+        knowledge, elements, is_aux_plural, is_subject_plural, is_int_verb_phrase_1
     )
     if aux_truth:
         return True, aux_pos
@@ -136,7 +82,7 @@ def is_tr_aux_phrase_s(knowledge, elements):
         return False, []
 
     aux_truth, aux_pos = is_wrapped(
-        knowledge, elements, is_aux_singular, is_subject_s, is_adverbs_with_tr_verb_1
+        knowledge, elements, is_aux_singular, is_subject_singular, is_adverbs_with_tr_verb_1
     )
     if aux_truth:
         return True, aux_pos
@@ -153,7 +99,7 @@ def is_tr_aux_phrase_p(knowledge, elements):
         return False, []
 
     aux_truth, aux_pos = is_wrapped(
-        knowledge, elements, is_aux_plural, is_subject_p, is_adverbs_with_tr_verb_1
+        knowledge, elements, is_aux_plural, is_subject_plural, is_adverbs_with_tr_verb_1
     )
     if aux_truth:
         return True, aux_pos
