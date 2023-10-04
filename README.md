@@ -30,4 +30,4 @@ The primary goal is to use this tool to build a syntactic parser for grammatical
 * Recursive sentence structures ("The cat the dog chases chases mice.")
 * Improved tokenization
 * Punctuation handling
-* Vocabulary data gathering (this has been outsourced)
+* Vocabulary data gathering
