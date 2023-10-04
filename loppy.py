@@ -1,5 +1,3 @@
-# First attempt at LOgically Parsing with PYthon
-
 class FactTracker(object):
     def __init__(self):
         # Initialize empty dict of name: elements
@@ -8,7 +6,7 @@ class FactTracker(object):
         self.known_elements = {}
 
     def update_knowledge(self, fact):
-        '''Add a fact to the known facts, and elements to known elements'''
+        """Add a fact to the known facts, and elements to known elements"""
         if fact.name in self.known_facts:
             self.known_facts[fact.name].add(fact.elements)
         else:
@@ -21,7 +19,7 @@ class FactTracker(object):
             self.known_elements[tup_elements] = [fact.name]
 
     def is_fact(self, fact):
-        '''Return a boolean indicating whether fact is true'''
+        """Return a boolean indicating whether fact is true"""
         if fact.name not in self.known_facts:
             return False
         if fact.elements in self.known_facts[fact.name]:
@@ -30,7 +28,7 @@ class FactTracker(object):
             return False
 
     def get_types(self, elements):
-        '''Return known fact-types of given list of elements'''
+        """Return known fact-types of given list of elements"""
         tup_elements = tuple(elements)
         if tup_elements in self.known_elements:
             return self.known_elements[tup_elements]
@@ -38,7 +36,7 @@ class FactTracker(object):
             return []
 
     def is_a(self, elements, type_query):
-        '''Return a boolean indicating if given elements match a given type'''
+        """Return a boolean indicating if given elements match a given type"""
         known_types = self.get_types(elements)
         if type_query in known_types:
             return True
@@ -46,11 +44,10 @@ class FactTracker(object):
             return False
 
     def solve_one(self, fact):
-        '''Provide all possible values for variables in a single fact'''
+        """Provide all possible values for variables in a single fact"""
         # List indices of elements that are variables and those that aren't
-        knowns = [i for i, e in enumerate(fact.elements) if e[0] != '?' 
-                    and e != '_']
-        unknowns = [i for i, e in enumerate(fact.elements) if e[0] == '?']
+        knowns = [i for i, e in enumerate(fact.elements) if e[0] != "?" and e != "_"]
+        unknowns = [i for i, e in enumerate(fact.elements) if e[0] == "?"]
 
         # Loop through all facts of this name
         # If all known elements match, that fact is a viable option
@@ -65,10 +62,10 @@ class FactTracker(object):
             # If choice is viable at the end, provide all solutions to unknowns
             if viable:
                 solution = [(fact.elements[u], choice[u]) for u in unknowns]
-                yield '{} = {}'.format(solution[0][0], solution[0][1])
+                yield "{} = {}".format(solution[0][0], solution[0][1])
 
     def solve_full(self, *args):
-        '''Yield only solutions that satisfy all searched facts'''
+        """Yield only solutions that satisfy all searched facts"""
         solutions = []
         for a in args:
             one_solved = set([])
